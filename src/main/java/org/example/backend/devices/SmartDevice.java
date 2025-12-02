@@ -1,17 +1,14 @@
 package org.example.backend.devices;
 
 import org.example.backend.home.Room;
-import org.example.backend.interfaces.Controllable;
-import org.example.backend.interfaces.EnergyConsumer;
 
-public abstract class SmartDevice implements Controllable, EnergyConsumer {
+public abstract class SmartDevice {
     // Basic device attributes
     protected String deviceId;
     protected String deviceName;
-    protected String location;        // Room name or description
+    protected String location; // Room where the device is located
     protected boolean isOn;
-    protected double energyConsumption; // base consumption in kWh
-    protected Room room;              // optional link to Room object
+    protected double energyConsumption; // in kWh
 
     // Constructor
     public SmartDevice(String deviceId, String deviceName, String location) {
@@ -20,36 +17,15 @@ public abstract class SmartDevice implements Controllable, EnergyConsumer {
         this.location = location;
         this.isOn = false;
         this.energyConsumption = 0.0;
-        this.room = null;
     }
 
-    // ----- Abstract methods to be implemented by subclasses -----
-    @Override
+    // Abstract methods that must be implemented by subclasses
     public abstract void turnOn();
-
-    @Override
     public abstract void turnOff();
-
     public abstract String getDeviceType();
+    public abstract String getStatus();
 
-    // ----- Common behaviour -----
-    @Override
-    public String getStatus() {
-        return isOn ? "ON" : "OFF";
-    }
-
-    @Override
-    public double getEnergyConsumption() {
-        return energyConsumption;
-    }
-
-    /**
-     * Calculate energy usage for a given number of hours.
-     */
-    public double calculateEnergyUsage(double hours) {
-        return isOn ? energyConsumption * hours : 0.0;
-    }
-
+    // Concrete methods
     public void toggle() {
         if (isOn) {
             turnOff();
@@ -58,7 +34,11 @@ public abstract class SmartDevice implements Controllable, EnergyConsumer {
         }
     }
 
-    // ----- Getters / setters -----
+    public double calculateEnergyUsage(double hours) {
+        return isOn ? energyConsumption * hours : 0.0;
+    }
+
+    // Getters and Setters
     public String getDeviceId() {
         return deviceId;
     }
@@ -91,27 +71,18 @@ public abstract class SmartDevice implements Controllable, EnergyConsumer {
         isOn = on;
     }
 
+    public double getEnergyConsumption() {
+        return energyConsumption;
+    }
+
     public void setEnergyConsumption(double energyConsumption) {
         this.energyConsumption = energyConsumption;
     }
 
-    public Room getRoom() {
-        return room;
-    }
-
-    public void setRoom(Room room) {
-        this.room = room;
-    }
-
     @Override
     public String toString() {
-        return String.format(
-                "%s [%s] - Location: %s, Status: %s, Energy: %.2f kWh",
-                deviceName,
-                getDeviceType(),
-                location,
-                isOn ? "ON" : "OFF",
-                energyConsumption
-        );
+        return String.format("%s [%s] - Location: %s, Status: %s, Energy: %.2f kWh",
+                deviceName, getDeviceType(), location, isOn ? "ON" : "OFF", energyConsumption);
     }
 }
+
