@@ -42,7 +42,7 @@ public class Room {
         if (device == null) return;
 
         for (SmartDevice d : devices) {
-            if (d.getId().equals(device.getId())) {
+            if (d.getDeviceId().equals(device.getDeviceId())) {
                 return; // duplicate → ignore
             }
         }
@@ -56,7 +56,7 @@ public class Room {
     public boolean removeDevice(String deviceId) {
         if (deviceId == null) return false;
 
-        return devices.removeIf(d -> d.getId().equals(deviceId));
+        return devices.removeIf(d -> d.getDeviceId().equals(deviceId));
     }
 
     /**
@@ -66,7 +66,7 @@ public class Room {
         if (deviceId == null) return null;
 
         for (SmartDevice d : devices) {
-            if (d.getId().equals(deviceId)) {
+            if (d.getDeviceId().equals(deviceId)) {
                 return d;
             }
         }
