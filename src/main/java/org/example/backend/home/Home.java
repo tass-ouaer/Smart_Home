@@ -1,4 +1,4 @@
-package org.example.backend.home;
+package backend.home;
 
 import java.util.ArrayList;
 import java.util.List;
