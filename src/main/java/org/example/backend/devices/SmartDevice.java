@@ -4,14 +4,18 @@ import org.example.backend.interfaces.Controllable;
 import org.example.backend.interfaces.EnergyConsumer;
 
 public abstract class SmartDevice implements Controllable, EnergyConsumer {
+
     protected String deviceId;
     protected String deviceName;
     protected String location;
     protected boolean isOn;
     protected double energyConsumption;
 
-    private long lastOnTimestamp;      // Removed = 0 (optional)
-    private long totalOnDuration;      // Removed = 0 (optional)
+    // NEW FIELD REQUIRED BY THE INTERFACE
+    protected double powerRating; // in watts
+
+    private long lastOnTimestamp;
+    private long totalOnDuration;
 
     public SmartDevice(String deviceId, String deviceName, String location) {
         this.deviceId = deviceId;
@@ -19,19 +23,18 @@ public abstract class SmartDevice implements Controllable, EnergyConsumer {
         this.location = location;
         this.isOn = false;
         this.energyConsumption = 0.0;
-        this.lastOnTimestamp = 0;      // Or remove this line
-        this.totalOnDuration = 0;      // Or remove this line
+        this.powerRating = 0.0;   // default value
+        this.lastOnTimestamp = 0;
+        this.totalOnDuration = 0;
     }
 
-    //  REMOVED @Override - these are abstract, not overriding
+    // ABSTRACT METHODS
     public abstract void turnOn();
-
     public abstract void turnOff();
-
     public abstract String getDeviceType();
-
     public abstract String getStatus();
 
+    // TIME TRACKING
     protected void startTimeTracking() {
         if (!isOn) {
             lastOnTimestamp = System.currentTimeMillis();
@@ -45,6 +48,7 @@ public abstract class SmartDevice implements Controllable, EnergyConsumer {
         }
     }
 
+    @Override
     public long getOnDurationSeconds() {
         long duration = totalOnDuration;
 
@@ -76,12 +80,22 @@ public abstract class SmartDevice implements Controllable, EnergyConsumer {
         }
     }
 
-    @Override  //  This IS overriding from EnergyConsumer interface
+    // ENERGY-CONSUMER INTERFACE IMPLEMENTATION
+    @Override
+    public double getPowerRating() {
+        return powerRating;
+    }
+
+    public void setPowerRating(double powerRating) {
+        this.powerRating = powerRating;
+    }
+
+    @Override
     public double getEnergyConsumption() {
         return energyConsumption;
     }
 
-    @Override  //  This IS overriding from EnergyConsumer interface
+    @Override
     public double calculateEnergyUsage(double hours) {
         return isOn ? energyConsumption * hours : 0.0;
     }
@@ -91,6 +105,7 @@ public abstract class SmartDevice implements Controllable, EnergyConsumer {
         return energyConsumption * hoursOn;
     }
 
+    // GETTERS / SETTERS
     public String getDeviceId() {
         return deviceId;
     }
@@ -129,7 +144,10 @@ public abstract class SmartDevice implements Controllable, EnergyConsumer {
 
     @Override
     public String toString() {
-        return String.format("%s [%s] - Location: %s, Status: %s, Energy: %.2f kWh",
-                deviceName, getDeviceType(), location, isOn ? "ON" : "OFF", energyConsumption);
+        return String.format(
+                "%s [%s] - Location: %s, Status: %s, Energy: %.2f kWh, Power: %.2f W",
+                deviceName, getDeviceType(), location, isOn ? "ON" : "OFF",
+                energyConsumption, powerRating
+        );
     }
 }
