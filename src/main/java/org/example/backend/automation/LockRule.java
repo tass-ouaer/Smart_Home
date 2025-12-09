@@ -1,65 +1,58 @@
 package org.example.backend.automation;
 
 import org.example.backend.home.Home;
-import org.example.backend.devices.SmartDoorLock;  // Changed from SmartLock
+import org.example.backend.home.Room;
+import org.example.backend.devices.SmartDoorLock;
 import java.time.LocalTime;
 
 public class LockRule extends AutomationRule {
-    private LocalTime autoLockTime;     // FIXED: variable name was wrong
-    private LocalTime autoUnlockTime;   // FIXED: variable name was wrong
-    private String lockDeviceName;
 
-    public LockRule(String ruleName, LocalTime lockTime,
-                   LocalTime unlockTime, String lockDeviceName) {
-        super(ruleName);
-        this.autoLockTime = lockTime;     // FIXED: assign to correct variable
-        this.autoUnlockTime = unlockTime; // FIXED: assign to correct variable
-        this.lockDeviceName = lockDeviceName;
+    private final LocalTime lockTime;
+    private final LocalTime unlockTime;
+    private final String deviceName;
+
+    public LockRule(String name, LocalTime lockTime,
+                    LocalTime unlockTime, String deviceName) {
+        super(name);
+        this.lockTime = lockTime;
+        this.unlockTime = unlockTime;
+        this.deviceName = deviceName;
     }
-    
+
     @Override
     public void apply(Home home) {
         if (!isActive) return;
-        
+
+        SmartDoorLock lock = findLock(home);
+        if (lock == null) return;
+
         LocalTime now = LocalTime.now();
-        
-        // Find the lock device by name
-        SmartDoorLock lock = findLockDevice(home);
-        if (lock == null) {
-            System.out.println("LockRule ERROR: Device '" + lockDeviceName + "' not found!");
-            return;
+        boolean withinInterval;
+
+        if (lockTime.isBefore(unlockTime)) {
+            // Normal case: 22:00 → 06:00
+            withinInterval = now.isAfter(lockTime) && now.isBefore(unlockTime);
+        } else {
+            // Midnight-crossing case
+            withinInterval = now.isAfter(lockTime) || now.isBefore(unlockTime);
         }
-        
-        // Check if it's time to lock (between lock time and unlock time)
-        if (now.isAfter(autoLockTime) && now.isBefore(autoUnlockTime)) {
-            if (!lock.isLocked()) {
-                lock.lock();
-                System.out.println("LockRule → Auto-locked " + lock.getDeviceName() + 
-                                 " at " + now);
-            }
-        } 
-        // Check if it's time to unlock (before lock time or after unlock time)
-        else if (now.isBefore(autoLockTime) || now.isAfter(autoUnlockTime)) {
-            if (lock.isLocked()) {
-                lock.unlock();
-                System.out.println("LockRule → Auto-unlocked " + lock.getDeviceName() + 
-                                 " at " + now);
-            }
+
+        if (withinInterval && !lock.isLocked()) {
+            lock.lock();
+        } else if (!withinInterval && lock.isLocked()) {
+            lock.turnOn(); // unlock (no code required)
         }
     }
-    
-    private SmartDoorLock findLockDevice(Home home) {
-        for (var device : home.getAllDevices()) {
-            if (device instanceof SmartDoorLock && 
-                device.getDeviceName().equals(lockDeviceName)) {
-                return (SmartDoorLock) device;
+
+    private SmartDoorLock findLock(Home home) {
+        for (Room room : home.getRooms()) {
+            for (var d : room.getDevices()) {
+                if (d instanceof SmartDoorLock &&
+                        d.getDeviceName().equalsIgnoreCase(deviceName)) {
+                    return (SmartDoorLock) d;
+                }
             }
         }
         return null;
     }
-    
-    // Getters
-    public LocalTime getAutoLockTime() { return autoLockTime; }
-    public LocalTime getAutoUnlockTime() { return autoUnlockTime; }
-    public String getLockDeviceName() { return lockDeviceName; }
 }
