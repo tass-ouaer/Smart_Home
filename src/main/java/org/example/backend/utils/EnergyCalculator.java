@@ -3,6 +3,8 @@ package org.example.backend.utils;
 import org.example.backend.devices.SmartDevice;
 import org.example.backend.interfaces.EnergyConsumer;
 import java.util.List;
+import org.example.backend.home.Room;
+import org.example.backend.home.Home;
 
 public class EnergyCalculator {
 
