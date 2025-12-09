@@ -4,32 +4,42 @@ import org.example.backend.interfaces.Schedulable;
 
 public class Sprinkler extends SmartDevice implements Schedulable {
 
-    private int waterFlowRate;
-    private int duration;
+    private int waterFlowRate;  // L/min
+    private int duration;       // minutes
     private String scheduledTime;
     private boolean isWatering;
 
     public Sprinkler(String deviceId, String deviceName, String location) {
         super(deviceId, deviceName, location);
+
         this.waterFlowRate = 10;
         this.duration = 30;
         this.scheduledTime = null;
         this.isWatering = false;
-        this.energyConsumption = 0.75;
+
+        // Typical garden sprinkler motor consumes 20–50 watts
+        this.setPowerRating(40.0);  // 40W is a realistic default
     }
 
+    // -----------------------------------------------------------
+    // POWER / WATERING CONTROL
+    // -----------------------------------------------------------
     @Override
     public void turnOn() {
-        this.isOn = true;
+        if (!isOn) {
+            this.isOn = true;
+            startTimeTracking();
+        }
+
         this.isWatering = true;
-        startTimeTracking();
         System.out.println(deviceName + " started watering - Duration: " + duration + " minutes");
     }
 
     @Override
     public void turnOff() {
-        stopTimeTracking();
+        if (isOn) stopTimeTracking();
         this.isOn = false;
+
         this.isWatering = false;
         System.out.println(deviceName + " stopped watering");
     }
@@ -43,11 +53,13 @@ public class Sprinkler extends SmartDevice implements Schedulable {
     public String getStatus() {
         if (isWatering) {
             return String.format("WATERING - %d minutes, %d L/min", duration, waterFlowRate);
-        } else {
-            return "OFF - Not watering";
         }
+        return "OFF - Not watering";
     }
 
+    // -----------------------------------------------------------
+    // SCHEDULING
+    // -----------------------------------------------------------
     @Override
     public void schedule(String time) {
         this.scheduledTime = time;
@@ -58,6 +70,9 @@ public class Sprinkler extends SmartDevice implements Schedulable {
         return scheduledTime;
     }
 
+    // -----------------------------------------------------------
+    // WATERING LOGIC
+    // -----------------------------------------------------------
     public void startWatering(int minutes) {
         if (minutes > 0) {
             this.duration = minutes;
@@ -91,19 +106,29 @@ public class Sprinkler extends SmartDevice implements Schedulable {
         return waterFlowRate;
     }
 
+    // -----------------------------------------------------------
+    // WATER USAGE
+    // -----------------------------------------------------------
     public double calculateWaterUsage() {
-        return waterFlowRate * duration;
+        return waterFlowRate * duration; // Liters used
     }
 
     public boolean isWatering() {
         return isWatering;
     }
 
+    // -----------------------------------------------------------
+    // TEST MODE
+    // -----------------------------------------------------------
     public void testSpray() {
         System.out.println("Testing " + deviceName + " - 1 minute test spray");
+
         int originalDuration = this.duration;
+
         this.duration = 1;
         turnOn();
+
+        // Restore original default duration
         this.duration = originalDuration;
     }
 }

@@ -10,26 +10,36 @@ public class GasDetector extends SensorDevice {
 
     public GasDetector(String deviceId, String deviceName, String location) {
         super(deviceId, deviceName, location);
+
         this.gasLevel = 0.0;
         this.alertThreshold = 50.0;
         this.alertTriggered = false;
-        this.energyConsumption = 0.002;
+
+        // Typical gas detector uses 2 watts
+        this.setPowerRating(2.0);
+
+        // Start active immediately (sensors are usually always ON)
         this.isOn = true;
+        startTimeTracking();
     }
 
     @Override
     public void turnOn() {
-        this.isOn = true;
-        startTimeTracking();
-        System.out.println(deviceName + " is now ACTIVE - Monitoring air quality");
+        if (!isOn) {
+            this.isOn = true;
+            startTimeTracking();
+            System.out.println(deviceName + " is now ACTIVE - Monitoring air quality");
+        }
     }
 
     @Override
     public void turnOff() {
-        stopTimeTracking();
-        this.isOn = false;
-        this.alertTriggered = false;
-        System.out.println(deviceName + " is now INACTIVE - Monitoring stopped");
+        if (isOn) {
+            stopTimeTracking();
+            this.isOn = false;
+            this.alertTriggered = false;
+            System.out.println(deviceName + " is now INACTIVE - Monitoring stopped");
+        }
     }
 
     @Override
@@ -56,15 +66,14 @@ public class GasDetector extends SensorDevice {
     public String readValue() {
         if (!isOn) return "INACTIVE";
 
-        if (alertTriggered) {
-            return "ALERT";
-        } else if (gasLevel > alertThreshold * 0.7) {
-            return "WARNING";
-        } else {
-            return "SAFE";
-        }
+        if (alertTriggered) return "ALERT";
+        if (gasLevel > alertThreshold * 0.7) return "WARNING";
+        return "SAFE";
     }
 
+    // -----------------------------------------------------------
+    // SENSOR LOGIC
+    // -----------------------------------------------------------
     public void updateGasLevel(double level) {
         if (level < 0) level = 0;
         if (level > 100) level = 100;
@@ -86,6 +95,9 @@ public class GasDetector extends SensorDevice {
         }
     }
 
+    // -----------------------------------------------------------
+    // GETTERS / SETTERS
+    // -----------------------------------------------------------
     public double getGasLevel() {
         return gasLevel;
     }

@@ -10,7 +10,10 @@ public class GarageDoor extends SmartDevice implements Schedulable {
     public GarageDoor(String deviceId, String deviceName, String location) {
         super(deviceId, deviceName, location);
         this.isOpen = false;
-        this.energyConsumption = 0.5;
+
+        // Power rating in watts of garage door motor
+        this.setPowerRating(500); // Example: 500W motor
+
         this.scheduledTime = null;
     }
 
@@ -18,15 +21,19 @@ public class GarageDoor extends SmartDevice implements Schedulable {
     public void turnOn() {
         this.isOn = true;
         this.isOpen = true;
+
         startTimeTracking();
+
         System.out.println(deviceName + " is now OPEN");
     }
 
     @Override
     public void turnOff() {
         stopTimeTracking();
+
         this.isOn = false;
         this.isOpen = false;
+
         System.out.println(deviceName + " is now CLOSED");
     }
 
@@ -37,11 +44,7 @@ public class GarageDoor extends SmartDevice implements Schedulable {
 
     @Override
     public String getStatus() {
-        if (isOpen) {
-            return "Door is OPEN - Ready to close";
-        } else {
-            return "Door is CLOSED - Secured";
-        }
+        return isOpen ? "Door is OPEN - Ready to close" : "Door is CLOSED - Secured";
     }
 
     @Override

@@ -11,24 +11,36 @@ public class SmartTV extends SmartDevice implements Schedulable {
 
     public SmartTV(String deviceId, String deviceName, String location) {
         super(deviceId, deviceName, location);
+
         this.volume = 50;
         this.channel = 1;
         this.isMuted = false;
         this.scheduledTime = null;
-        this.energyConsumption = 0.15;
+
+        // Typical modern LED TV uses 80–120 watts. We'll use 100W.
+        this.setPowerRating(100.0);
     }
 
+    // ------------------------------------------------------------
+    // POWER / STATE HANDLING
+    // ------------------------------------------------------------
     @Override
     public void turnOn() {
-        this.isOn = true;
-        startTimeTracking();
+        if (!isOn) {
+            this.isOn = true;
+            startTimeTracking();
+        }
+
         System.out.println(deviceName + " is now ON - Channel " + channel + ", Volume " + volume + "%");
     }
 
     @Override
     public void turnOff() {
-        stopTimeTracking();
+        if (isOn) {
+            stopTimeTracking();
+        }
         this.isOn = false;
+
         System.out.println(deviceName + " is now OFF");
     }
 
@@ -39,14 +51,15 @@ public class SmartTV extends SmartDevice implements Schedulable {
 
     @Override
     public String getStatus() {
-        if (isOn) {
-            String muteStatus = isMuted ? " (MUTED)" : "";
-            return String.format("ON - Channel %d, Volume %d%%%s", channel, volume, muteStatus);
-        } else {
-            return "OFF";
-        }
+        if (!isOn) return "OFF";
+
+        String muteStatus = isMuted ? " (MUTED)" : "";
+        return String.format("ON - Channel %d, Volume %d%%%s", channel, volume, muteStatus);
     }
 
+    // ------------------------------------------------------------
+    // SCHEDULING
+    // ------------------------------------------------------------
     @Override
     public void schedule(String time) {
         this.scheduledTime = time;
@@ -57,6 +70,9 @@ public class SmartTV extends SmartDevice implements Schedulable {
         return scheduledTime;
     }
 
+    // ------------------------------------------------------------
+    // VOLUME CONTROL
+    // ------------------------------------------------------------
     public void setVolume(int level) {
         if (!isOn) {
             System.out.println("TV is off - cannot adjust volume");
@@ -68,6 +84,7 @@ public class SmartTV extends SmartDevice implements Schedulable {
 
         this.volume = level;
         this.isMuted = false;
+
         System.out.println(deviceName + " volume set to " + volume + "%");
     }
 
@@ -97,6 +114,9 @@ public class SmartTV extends SmartDevice implements Schedulable {
         return isMuted;
     }
 
+    // ------------------------------------------------------------
+    // CHANNEL CONTROL
+    // ------------------------------------------------------------
     public void setChannel(int channelNumber) {
         if (!isOn) {
             System.out.println("TV is off - cannot change channel");

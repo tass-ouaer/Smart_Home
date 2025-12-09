@@ -6,33 +6,44 @@ public class Thermostat extends SmartDevice implements Schedulable {
 
     private double currentTemperature;
     private double targetTemperature;
-    private String mode;
+    private String mode;             // HEAT | COOL | AUTO | OFF
     private String scheduledTime;
 
     public Thermostat(String deviceId, String deviceName, String location) {
         super(deviceId, deviceName, location);
+
         this.currentTemperature = 22.0;
         this.targetTemperature = 22.0;
         this.mode = "OFF";
         this.scheduledTime = null;
-        this.energyConsumption = 1.5;
+
+        // Thermostat control circuitry consumes ~5W
+        this.setPowerRating(5.0);
     }
 
+    // ------------------------------------------------------------------
+    // POWER STATE
+    // ------------------------------------------------------------------
     @Override
     public void turnOn() {
-        this.isOn = true;
-        startTimeTracking();
+        if (!isOn) {
+            this.isOn = true;
+            startTimeTracking();
+        }
+
         if (mode.equals("OFF")) {
             this.mode = "AUTO";
         }
+
         System.out.println(deviceName + " is now ON - Target: " + targetTemperature + "°C, Mode: " + mode);
     }
 
     @Override
     public void turnOff() {
-        stopTimeTracking();
+        if (isOn) stopTimeTracking();
         this.isOn = false;
         this.mode = "OFF";
+
         System.out.println(deviceName + " is now OFF");
     }
 
@@ -43,25 +54,24 @@ public class Thermostat extends SmartDevice implements Schedulable {
 
     @Override
     public String getStatus() {
-        if (isOn) {
-            String action = getHeatingCoolingAction();
-            return String.format("%s - Current: %.1f°C, Target: %.1f°C (%s)",
-                    mode, currentTemperature, targetTemperature, action);
-        } else {
+        if (!isOn) {
             return String.format("OFF - Current: %.1f°C", currentTemperature);
         }
+
+        String action = getHeatingCoolingAction();
+        return String.format("%s - Current: %.1f°C, Target: %.1f°C (%s)",
+                mode, currentTemperature, targetTemperature, action);
     }
 
     private String getHeatingCoolingAction() {
-        if (currentTemperature < targetTemperature - 0.5) {
-            return "Heating";
-        } else if (currentTemperature > targetTemperature + 0.5) {
-            return "Cooling";
-        } else {
-            return "Maintaining";
-        }
+        if (currentTemperature < targetTemperature - 0.5) return "Heating";
+        if (currentTemperature > targetTemperature + 0.5) return "Cooling";
+        return "Maintaining";
     }
 
+    // ------------------------------------------------------------------
+    // SCHEDULING
+    // ------------------------------------------------------------------
     @Override
     public void schedule(String time) {
         this.scheduledTime = time;
@@ -72,17 +82,19 @@ public class Thermostat extends SmartDevice implements Schedulable {
         return scheduledTime;
     }
 
+    // ------------------------------------------------------------------
+    // TEMPERATURE LOGIC
+    // ------------------------------------------------------------------
     public void setTargetTemperature(double temperature) {
-        if (temperature >= 10.0 && temperature <= 35.0) {
-            this.targetTemperature = temperature;
-            System.out.println(deviceName + " target temperature set to " + targetTemperature + "°C");
-
-            if (isOn) {
-                adjustTemperature();
-            }
-        } else {
+        if (temperature < 10.0 || temperature > 35.0) {
             System.out.println("Invalid temperature - Must be between 10°C and 35°C");
+            return;
         }
+
+        this.targetTemperature = temperature;
+        System.out.println(deviceName + " target temperature set to " + targetTemperature + "°C");
+
+        if (isOn) adjustTemperature();
     }
 
     public double getTargetTemperature() {
@@ -96,23 +108,26 @@ public class Thermostat extends SmartDevice implements Schedulable {
     public void updateCurrentTemperature(double temperature) {
         this.currentTemperature = temperature;
         System.out.println(deviceName + " current temperature: " + currentTemperature + "°C");
+
+        if (isOn) adjustTemperature();
     }
 
     public void setMode(String mode) {
-        String upperMode = mode.toUpperCase();
-        if (upperMode.equals("HEAT") || upperMode.equals("COOL") ||
-                upperMode.equals("AUTO") || upperMode.equals("OFF")) {
+        String upper = mode.toUpperCase();
 
-            this.mode = upperMode;
-            System.out.println(deviceName + " mode set to " + this.mode);
-
-            if (upperMode.equals("OFF")) {
-                turnOff();
-            } else if (!isOn) {
-                turnOn();
-            }
-        } else {
+        if (!upper.equals("HEAT") && !upper.equals("COOL") &&
+                !upper.equals("AUTO") && !upper.equals("OFF")) {
             System.out.println("Invalid mode - Use HEAT, COOL, AUTO, or OFF");
+            return;
+        }
+
+        this.mode = upper;
+        System.out.println(deviceName + " mode set to " + this.mode);
+
+        if (upper.equals("OFF")) {
+            turnOff();
+        } else if (!isOn) {
+            turnOn();
         }
     }
 
@@ -131,37 +146,55 @@ public class Thermostat extends SmartDevice implements Schedulable {
     private void adjustTemperature() {
         if (!isOn) return;
 
-        if (currentTemperature < targetTemperature - 0.5) {
-            if (mode.equals("HEAT") || mode.equals("AUTO")) {
-                System.out.println(deviceName + " is HEATING");
-            }
-        } else if (currentTemperature > targetTemperature + 0.5) {
-            if (mode.equals("COOL") || mode.equals("AUTO")) {
-                System.out.println(deviceName + " is COOLING");
-            }
+        String action = getHeatingCoolingAction();
+
+        if (action.equals("Heating") && (mode.equals("HEAT") || mode.equals("AUTO"))) {
+            System.out.println(deviceName + " is HEATING");
+        } else if (action.equals("Cooling") && (mode.equals("COOL") || mode.equals("AUTO"))) {
+            System.out.println(deviceName + " is COOLING");
         } else {
             System.out.println(deviceName + " maintaining temperature");
         }
     }
 
+    // ------------------------------------------------------------------
+    // ENERGY CONSUMPTION
+    // ------------------------------------------------------------------
     @Override
-    public double calculateEnergyUsage(double hours) {
+    public double getEnergyConsumption() {
         if (!isOn) return 0.0;
 
-        double tempDiff = Math.abs(currentTemperature - targetTemperature);
-        double usageFactor = 1.0 + (tempDiff / 10.0);
+        double basePower = getPowerRating(); // thermostat electronics
 
-        return energyConsumption * hours * usageFactor;
+        // Additional power depends on mode
+        double hvacPower = 0.0;
+
+        String action = getHeatingCoolingAction();
+
+        if (action.equals("Heating") && (mode.equals("HEAT") || mode.equals("AUTO"))) {
+            hvacPower = 2000.0;        // Heater ~2 kW
+        } else if (action.equals("Cooling") && (mode.equals("COOL") || mode.equals("AUTO"))) {
+            hvacPower = 1500.0;        // AC ~1.5 kW
+        }
+
+        double effectivePower = basePower + hvacPower;
+
+        return (effectivePower * getOnDurationSeconds()) / (1000.0 * 3600.0);
     }
 
     @Override
-    public double calculateActualEnergyUsage() {
-        if (!isOn) return 0.0;
+    public double calculateEnergyUsage(double hours) {
+        double basePower = getPowerRating();
+        double hvacPower = 0.0;
 
-        double hoursOn = getOnDurationHours();
-        double tempDiff = Math.abs(currentTemperature - targetTemperature);
-        double usageFactor = 1.0 + (tempDiff / 10.0);
+        String action = getHeatingCoolingAction();
 
-        return energyConsumption * hoursOn * usageFactor;
+        if (action.equals("Heating") && (mode.equals("HEAT") || mode.equals("AUTO"))) {
+            hvacPower = 2000.0;
+        } else if (action.equals("Cooling") && (mode.equals("COOL") || mode.equals("AUTO"))) {
+            hvacPower = 1500.0;
+        }
+
+        return ((basePower + hvacPower) / 1000.0) * hours;
     }
 }
