@@ -1,58 +1,34 @@
 package org.example.backend.automation;
 
-import org.example.backend.home.Home;
-import org.example.backend.home.Room;
+import org.example.backend.controller.CentralController;
 import org.example.backend.devices.SmartDoorLock;
+
 import java.time.LocalTime;
 
 public class LockRule extends AutomationRule {
 
-    private final LocalTime lockTime;
-    private final LocalTime unlockTime;
-    private final String deviceName;
+    private String lockDeviceId;
+    private LocalTime lockTime;
+    private LocalTime unlockTime;
 
-    public LockRule(String name, LocalTime lockTime,
-                    LocalTime unlockTime, String deviceName) {
-        super(name);
+    public LockRule(String ruleName, String lockDeviceId, LocalTime lockTime, LocalTime unlockTime) {
+        super(ruleName);
+        this.lockDeviceId = lockDeviceId;
         this.lockTime = lockTime;
         this.unlockTime = unlockTime;
-        this.deviceName = deviceName;
     }
 
     @Override
-    public void apply(Home home) {
+    public void apply(CentralController controller) {
         if (!isActive) return;
 
-        SmartDoorLock lock = findLock(home);
+        SmartDoorLock lock = (SmartDoorLock) controller.findDeviceById(lockDeviceId);
         if (lock == null) return;
 
         LocalTime now = LocalTime.now();
-        boolean withinInterval;
+        boolean shouldBeLocked = now.isAfter(lockTime) && now.isBefore(unlockTime);
 
-        if (lockTime.isBefore(unlockTime)) {
-            // Normal case: 22:00 → 06:00
-            withinInterval = now.isAfter(lockTime) && now.isBefore(unlockTime);
-        } else {
-            // Midnight-crossing case
-            withinInterval = now.isAfter(lockTime) || now.isBefore(unlockTime);
-        }
-
-        if (withinInterval && !lock.isLocked()) {
-            lock.lock();
-        } else if (!withinInterval && lock.isLocked()) {
-            lock.turnOn(); // unlock (no code required)
-        }
-    }
-
-    private SmartDoorLock findLock(Home home) {
-        for (Room room : home.getRooms()) {
-            for (var d : room.getDevices()) {
-                if (d instanceof SmartDoorLock &&
-                        d.getDeviceName().equalsIgnoreCase(deviceName)) {
-                    return (SmartDoorLock) d;
-                }
-            }
-        }
-        return null;
+        if (shouldBeLocked && !lock.isLocked()) lock.lock();
+        if (!shouldBeLocked && lock.isLocked()) lock.turnOn(); // unlock
     }
 }

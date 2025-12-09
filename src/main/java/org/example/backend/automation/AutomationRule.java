@@ -1,21 +1,36 @@
 package org.example.backend.automation;
 
-import org.example.backend.home.Home;
+import org.example.backend.controller.CentralController;
 
 public abstract class AutomationRule {
 
-    protected final String ruleName;
-    protected boolean isActive = true;
+    protected String ruleName;
+    protected boolean isActive;
 
     public AutomationRule(String ruleName) {
         this.ruleName = ruleName;
+        this.isActive = true;
     }
 
-    public String getRuleName() { return ruleName; }
-    public boolean isActive() { return isActive; }
+    public String getRuleName() {
+        return ruleName;
+    }
 
-    public void activate() { isActive = true; }
-    public void deactivate() { isActive = false; }
+    public boolean isActive() {
+        return isActive;
+    }
 
-    public abstract void apply(Home home);
+    public void activate() {
+        this.isActive = true;
+    }
+
+    public void deactivate() {
+        this.isActive = false;
+    }
+
+    /**
+     * Apply the automation rule using the CentralController.
+     * Each rule must implement its own logic here.
+     */
+    public abstract void apply(CentralController controller);
 }
