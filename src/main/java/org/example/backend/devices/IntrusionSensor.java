@@ -10,27 +10,37 @@ public class IntrusionSensor extends SensorDevice {
 
     public IntrusionSensor(String deviceId, String deviceName, String location) {
         super(deviceId, deviceName, location);
+
         this.intrusionDetected = false;
         this.isArmed = false;
         this.sensitivityLevel = 5;
-        this.energyConsumption = 0.001;
+
+        // Typical PIR intrusion sensor consumes ~1 watt
+        this.setPowerRating(1.0);
+
+        // Sensors are normally always ON
         this.isOn = true;
+        startTimeTracking();
     }
 
     @Override
     public void turnOn() {
-        this.isOn = true;
-        startTimeTracking();
-        System.out.println(deviceName + " is now ACTIVE");
+        if (!isOn) {
+            this.isOn = true;
+            startTimeTracking();
+            System.out.println(deviceName + " is now ACTIVE");
+        }
     }
 
     @Override
     public void turnOff() {
-        stopTimeTracking();
-        this.isOn = false;
-        this.isArmed = false;
-        this.intrusionDetected = false;
-        System.out.println(deviceName + " is now INACTIVE");
+        if (isOn) {
+            stopTimeTracking();
+            this.isOn = false;
+            this.isArmed = false;
+            this.intrusionDetected = false;
+            System.out.println(deviceName + " is now INACTIVE");
+        }
     }
 
     @Override
@@ -46,11 +56,13 @@ public class IntrusionSensor extends SensorDevice {
 
         if (intrusionDetected) {
             return "INTRUSION DETECTED! - Security breach at " + location;
-        } else if (isArmed) {
-            return "ARMED - Monitoring for intrusions";
-        } else {
-            return "DISARMED - Not monitoring";
         }
+
+        if (isArmed) {
+            return "ARMED - Monitoring for intrusions";
+        }
+
+        return "DISARMED - Not monitoring";
     }
 
     @Override
@@ -61,6 +73,10 @@ public class IntrusionSensor extends SensorDevice {
         return "DISARMED";
     }
 
+    // -----------------------------------------------------------
+    // SECURITY LOGIC
+    // -----------------------------------------------------------
+
     public void arm() {
         if (!isOn) {
             System.out.println("Cannot arm - Sensor is powered off");
@@ -69,6 +85,7 @@ public class IntrusionSensor extends SensorDevice {
 
         this.isArmed = true;
         this.intrusionDetected = false;
+
         System.out.println(deviceName + " is now ARMED - Monitoring active");
     }
 
@@ -79,11 +96,10 @@ public class IntrusionSensor extends SensorDevice {
     }
 
     public void detectIntrusion() {
-        if (!isOn || !isArmed) {
-            return;
-        }
+        if (!isOn || !isArmed) return;
 
         this.intrusionDetected = true;
+
         System.out.println("INTRUSION ALERT - " + deviceName);
         System.out.println("Location: " + location);
         System.out.println("Time: " + java.time.LocalTime.now());

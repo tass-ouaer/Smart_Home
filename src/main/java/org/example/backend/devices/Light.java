@@ -4,27 +4,34 @@ import org.example.backend.interfaces.Schedulable;
 
 public class Light extends SmartDevice implements Schedulable {
 
-    private int brightness;
+    private int brightness;       // 0–100%
     private String scheduledTime;
 
     public Light(String deviceId, String deviceName, String location) {
         super(deviceId, deviceName, location);
+
         this.brightness = 100;
-        this.energyConsumption = 0.06;
         this.scheduledTime = null;
+
+        // Typical LED light bulb uses ~10 watts at 100% brightness
+        this.setPowerRating(10.0);
     }
 
     @Override
     public void turnOn() {
-        this.isOn = true;
-        startTimeTracking();
+        if (!isOn) {
+            this.isOn = true;
+            startTimeTracking();
+        }
         System.out.println(deviceName + " is now ON (Brightness: " + brightness + "%)");
     }
 
     @Override
     public void turnOff() {
-        stopTimeTracking();
-        this.isOn = false;
+        if (isOn) {
+            stopTimeTracking();
+            this.isOn = false;
+        }
         System.out.println(deviceName + " is now OFF");
     }
 
@@ -35,11 +42,7 @@ public class Light extends SmartDevice implements Schedulable {
 
     @Override
     public String getStatus() {
-        if (isOn) {
-            return "ON - Brightness: " + brightness + "%";
-        } else {
-            return "OFF";
-        }
+        return isOn ? "ON - Brightness: " + brightness + "%" : "OFF";
     }
 
     @Override
@@ -52,13 +55,16 @@ public class Light extends SmartDevice implements Schedulable {
         return scheduledTime;
     }
 
+    // -----------------------------------------------------------
+    // BRIGHTNESS CONTROL
+    // -----------------------------------------------------------
     public void setBrightness(int level) {
         if (level < 0) level = 0;
         if (level > 100) level = 100;
 
         this.brightness = level;
 
-        if (level == 0) {
+        if (brightness == 0) {
             turnOff();
         } else if (!isOn) {
             turnOn();
@@ -79,15 +85,23 @@ public class Light extends SmartDevice implements Schedulable {
         setBrightness(brightness + amount);
     }
 
+    // -----------------------------------------------------------
+    // ENERGY MODEL → brightness reduces energy usage
+    // -----------------------------------------------------------
     @Override
-    public double calculateEnergyUsage(double hours) {
-        if (!isOn) return 0.0;
-        return energyConsumption * hours * (brightness / 100.0);
+    public double getEnergyConsumption() {
+        // Compute kWh based on brightness
+        double brightnessFactor = brightness / 100.0;
+        double effectivePower = getPowerRating() * brightnessFactor;
+
+        // Convert W × seconds → kWh
+        return (effectivePower * getOnDurationSeconds()) / (1000.0 * 3600.0);
     }
 
     @Override
-    public double calculateActualEnergyUsage() {
-        double hoursOn = getOnDurationHours();
-        return energyConsumption * hoursOn * (brightness / 100.0);
+    public double calculateEnergyUsage(double hours) {
+        double brightnessFactor = brightness / 100.0;
+        double effectivePower = getPowerRating() * brightnessFactor;
+        return (effectivePower / 1000.0) * hours;
     }
 }

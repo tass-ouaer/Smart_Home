@@ -6,33 +6,45 @@ public class MotionSensor extends SensorDevice {
 
     private boolean motionDetected;
     private long lastMotionTime;
-    private int detectionRange;
-    private boolean isActive;
+    private int detectionRange;     // meters
+    private boolean isActive;       // monitoring enabled or not
 
     public MotionSensor(String deviceId, String deviceName, String location) {
         super(deviceId, deviceName, location);
+
         this.motionDetected = false;
         this.lastMotionTime = 0;
         this.detectionRange = 5;
         this.isActive = true;
-        this.energyConsumption = 0.001;
+
+        // Typical PIR motion sensor: 0.8 watts
+        this.setPowerRating(0.8);
+
+        // Motion sensor is ON by default
         this.isOn = true;
+        startTimeTracking();
     }
 
     @Override
     public void turnOn() {
-        this.isOn = true;
+        if (!isOn) {
+            this.isOn = true;
+            startTimeTracking();
+        }
         this.isActive = true;
-        startTimeTracking();
+
         System.out.println(deviceName + " is now ACTIVE - Motion monitoring enabled");
     }
 
     @Override
     public void turnOff() {
-        stopTimeTracking();
+        if (isOn) {
+            stopTimeTracking();
+        }
         this.isOn = false;
         this.isActive = false;
         this.motionDetected = false;
+
         System.out.println(deviceName + " is now INACTIVE - Motion monitoring disabled");
     }
 
@@ -49,15 +61,14 @@ public class MotionSensor extends SensorDevice {
 
         if (motionDetected) {
             return "MOTION DETECTED - Activity in " + location;
-        } else {
-            long timeSinceMotion = System.currentTimeMillis() - lastMotionTime;
-            if (lastMotionTime == 0) {
-                return "NO MOTION - Monitoring active";
-            } else {
-                long secondsAgo = timeSinceMotion / 1000;
-                return "NO MOTION - Last detected " + secondsAgo + "s ago";
-            }
         }
+
+        if (lastMotionTime == 0) {
+            return "NO MOTION - Monitoring active";
+        }
+
+        long secondsAgo = (System.currentTimeMillis() - lastMotionTime) / 1000;
+        return "NO MOTION - Last detected " + secondsAgo + "s ago";
     }
 
     @Override
@@ -66,13 +77,16 @@ public class MotionSensor extends SensorDevice {
         return motionDetected ? "MOTION" : "NO_MOTION";
     }
 
+    // -----------------------------------------------------------
+    // MOTION DETECTION LOGIC
+    // -----------------------------------------------------------
+
     public void detectMotion() {
-        if (!isOn || !isActive) {
-            return;
-        }
+        if (!isOn || !isActive) return;
 
         this.motionDetected = true;
         this.lastMotionTime = System.currentTimeMillis();
+
         System.out.println("MOTION DETECTED - " + deviceName + " at " + location);
     }
 
@@ -80,6 +94,10 @@ public class MotionSensor extends SensorDevice {
         this.motionDetected = false;
         System.out.println("Motion cleared - " + deviceName);
     }
+
+    // -----------------------------------------------------------
+    // GETTERS / SETTERS
+    // -----------------------------------------------------------
 
     public boolean isMotionDetected() {
         return motionDetected;
@@ -92,7 +110,6 @@ public class MotionSensor extends SensorDevice {
     public long getSecondsSinceLastMotion() {
         if (lastMotionTime == 0) return -1;
         if (motionDetected) return 0;
-
         return (System.currentTimeMillis() - lastMotionTime) / 1000;
     }
 
