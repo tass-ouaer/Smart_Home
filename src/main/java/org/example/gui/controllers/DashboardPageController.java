@@ -8,10 +8,8 @@ import javafx.geometry.Insets;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
+
 import org.example.backend.automation.*;
-
-import java.time.LocalTime;
-
 import org.example.backend.home.*;
 import org.example.backend.devices.*;
 import org.example.backend.controller.CentralController;
@@ -20,6 +18,7 @@ import org.example.backend.interfaces.Schedulable;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.time.LocalTime;
 
 public class DashboardPageController implements Initializable {
 
@@ -42,34 +41,35 @@ public class DashboardPageController implements Initializable {
     @FXML private Button removeRoomBtn;
 
     // ================= BACKEND =================
-    private AutomationEngine automationEngine;
     private CentralController controller;
     private Scheduler scheduler;
+    private AutomationEngine automationEngine;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
         Home home = HomeFactory.createDefaultHome();
         controller = new CentralController(home);
         scheduler = new Scheduler();
         automationEngine = new AutomationEngine(controller);
 
-// Register rules
+        // ================= AUTOMATION RULES =================
         automationEngine.addRule(new TemperatureRule("Temp Control", 20.0, 24.0));
         automationEngine.addRule(new MotionRule(
-                "Entry Hall Motion Lock",
-                "motion_entry",     // motion sensor in entry hall
-                "front_door",       // smart door lock
-                60                // seconds without motion → lock
+                "Entry Motion Lock",
+                "motion_entry",
+                "front_door",
+                60
         ));
-
         automationEngine.addRule(new LockRule(
                 "Night Lock",
                 "front_door",
-                java.time.LocalTime.of(22, 0),
-                java.time.LocalTime.of(6, 0)
+                LocalTime.of(22, 0),
+                LocalTime.of(6, 0)
         ));
+
         Timeline automationLoop = new Timeline(
-                new KeyFrame(javafx.util.Duration.seconds(5), e -> {
+                new KeyFrame(Duration.seconds(5), e -> {
                     automationEngine.run();
                     renderRooms();
                     updateDashboardStats();
@@ -78,27 +78,10 @@ public class DashboardPageController implements Initializable {
         automationLoop.setCycleCount(Timeline.INDEFINITE);
         automationLoop.play();
 
-
-
         setupActions();
         renderRooms();
         updateDashboardStats();
         startSchedulerLoop();
-        new Thread(() -> {
-            while (true) {
-                scheduler.runDueTasks();
-
-                // 🔥 FORCE GUI REFRESH ON FX THREAD
-                javafx.application.Platform.runLater(() -> {
-                    renderRooms();
-                    updateDashboardStats();
-                });
-
-                try {
-                    Thread.sleep(60_000); // every minute
-                } catch (InterruptedException ignored) {}
-            }
-        }).start();
     }
 
     // =====================================================
@@ -110,7 +93,6 @@ public class DashboardPageController implements Initializable {
             roomsContainer.getChildren().add(createRoomCard(room));
         }
     }
-
 
     private VBox createRoomCard(Room room) {
         VBox card = new VBox(10);
@@ -166,22 +148,28 @@ public class DashboardPageController implements Initializable {
 
         row.getChildren().addAll(info, toggle);
 
-        // ================= THERMOSTAT CONTROLS =================
+        // ===== THERMOSTAT =====
         if (device instanceof Thermostat thermostat) {
             Button minus = new Button("−");
             Button plus = new Button("+");
             Button scheduleBtn = new Button("Schedule");
 
             minus.setOnAction(e -> {
-                thermostat.decreaseTemperature();
+                try {
+                    thermostat.decreaseTemperature();
+                } catch (Exception ex) {
+                    showError("Temperature Error", ex.getMessage());
+                }
                 renderRooms();
-                updateDashboardStats();
             });
 
             plus.setOnAction(e -> {
-                thermostat.increaseTemperature();
+                try {
+                    thermostat.increaseTemperature();
+                } catch (Exception ex) {
+                    showError("Temperature Error", ex.getMessage());
+                }
                 renderRooms();
-                updateDashboardStats();
             });
 
             scheduleBtn.setOnAction(e -> {
@@ -192,15 +180,13 @@ public class DashboardPageController implements Initializable {
             row.getChildren().addAll(minus, plus, scheduleBtn);
         }
 
-        // ================= SPRINKLER CONTROLS =================
+        // ===== SPRINKLER =====
         if (device instanceof Sprinkler sprinkler) {
             Button scheduleBtn = new Button("Schedule");
-
             scheduleBtn.setOnAction(e -> {
                 scheduleDevice(sprinkler);
                 renderRooms();
             });
-
             row.getChildren().add(scheduleBtn);
         }
 
@@ -217,16 +203,11 @@ public class DashboardPageController implements Initializable {
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
+
     private void setupActions() {
-
-        allLightsOnBtn.setOnAction(e ->
-                applyToDevices(Light.class, SmartDevice::turnOn));
-
-        allLightsOffBtn.setOnAction(e ->
-                applyToDevices(Light.class, SmartDevice::turnOff));
-
-        lockAllDoorsBtn.setOnAction(e ->
-                applyToDevices(SmartDoorLock.class, SmartDevice::turnOn));
+        allLightsOnBtn.setOnAction(e -> applyToDevices(Light.class, SmartDevice::turnOn));
+        allLightsOffBtn.setOnAction(e -> applyToDevices(Light.class, SmartDevice::turnOff));
+        lockAllDoorsBtn.setOnAction(e -> applyToDevices(SmartDoorLock.class, SmartDevice::turnOn));
 
         awayModeBtn.setOnAction(e -> {
             applyToDevices(Light.class, SmartDevice::turnOff);
@@ -254,18 +235,27 @@ public class DashboardPageController implements Initializable {
     private void addRoom() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setHeaderText("Enter room name");
+
         dialog.showAndWait().ifPresent(name -> {
-            controller.addRoom(name);
-            renderRooms();
-            updateDashboardStats();
+            try {
+                controller.addRoom(name);
+                renderRooms();
+                updateDashboardStats();
+            } catch (IllegalArgumentException e) {
+                showError("Invalid Room", e.getMessage());
+            }
         });
     }
 
     private void removeRoom() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setHeaderText("Room name to remove");
+
         dialog.showAndWait().ifPresent(name -> {
-            controller.removeRoom(name);
+            boolean removed = controller.removeRoom(name);
+            if (!removed) {
+                showError("Room Not Found", "No room named: " + name);
+            }
             renderRooms();
             updateDashboardStats();
         });
@@ -277,56 +267,47 @@ public class DashboardPageController implements Initializable {
     private void addDevice(Room room) {
         ChoiceDialog<String> dialog = new ChoiceDialog<>(
                 "Light",
-                "Light",
-                "Thermostat",
-                "SmartDoorLock",
-                "SmartTV",
-                "Sprinkler",
-                "MotionSensor",
-                "IntrusionSensor",
-                "GasDetector",
-                "GarageDoor"
+                "Light", "Thermostat", "SmartDoorLock", "SmartTV",
+                "Sprinkler", "MotionSensor", "IntrusionSensor",
+                "GasDetector", "GarageDoor"
         );
 
         dialog.setHeaderText("Select device type");
+
         dialog.showAndWait().ifPresent(type -> {
+            try {
+                String id = room.getRoomName().toLowerCase() + "_" + System.nanoTime();
+                SmartDevice device = switch (type) {
+                    case "Thermostat" -> new Thermostat(id, "Thermostat", room.getRoomName());
+                    case "SmartDoorLock" -> new SmartDoorLock(id, "Door Lock", room.getRoomName());
+                    case "SmartTV" -> new SmartTV(id, "Smart TV", room.getRoomName());
+                    case "Sprinkler" -> new Sprinkler(id, "Sprinkler", room.getRoomName());
+                    case "MotionSensor" -> new MotionSensor(id, "Motion Sensor", room.getRoomName());
+                    case "IntrusionSensor" -> new IntrusionSensor(id, "Intrusion Sensor", room.getRoomName());
+                    case "GasDetector" -> new GasDetector(id, "Gas Detector", room.getRoomName());
+                    case "GarageDoor" -> new GarageDoor(id, "Garage Door", room.getRoomName());
+                    default -> new Light(id, "Light", room.getRoomName());
+                };
 
-            String id = room.getRoomName().toLowerCase() + "_" + System.nanoTime();
-            SmartDevice device;
+                controller.addDeviceToRoom(room.getRoomName(), device);
+                renderRooms();
+                updateDashboardStats();
 
-            switch (type) {
-                case "Thermostat" ->
-                        device = new Thermostat(id, "Thermostat", room.getRoomName());
-                case "SmartDoorLock" ->
-                        device = new SmartDoorLock(id, "Door Lock", room.getRoomName());
-                case "SmartTV" ->
-                        device = new SmartTV(id, "Smart TV", room.getRoomName());
-                case "Sprinkler" ->
-                        device = new Sprinkler(id, "Sprinkler", room.getRoomName());
-                case "MotionSensor" ->
-                        device = new MotionSensor(id, "Motion Sensor", room.getRoomName());
-                case "IntrusionSensor" ->
-                        device = new IntrusionSensor(id, "Intrusion Sensor", room.getRoomName());
-                case "GasDetector" ->
-                        device = new GasDetector(id, "Gas Detector", room.getRoomName());
-                case "GarageDoor" ->
-                        device = new GarageDoor(id, "Garage Door", room.getRoomName());
-                default ->
-                        device = new Light(id, "Light", room.getRoomName());
+            } catch (IllegalArgumentException e) {
+                showError("Device Error", e.getMessage());
             }
-
-            controller.addDeviceToRoom(room.getRoomName(), device);
-            renderRooms();
-            updateDashboardStats();
         });
     }
-
 
     private void removeDevice(Room room) {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setHeaderText("Enter device ID");
+
         dialog.showAndWait().ifPresent(id -> {
-            controller.removeDevice(room.getRoomName(), id);
+            boolean removed = controller.removeDevice(room.getRoomName(), id);
+            if (!removed) {
+                showError("Device Not Found", "No device with ID: " + id);
+            }
             renderRooms();
             updateDashboardStats();
         });
@@ -335,10 +316,14 @@ public class DashboardPageController implements Initializable {
     private void findDeviceById() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setHeaderText("Enter device ID");
+
         dialog.showAndWait().ifPresent(id -> {
             SmartDevice d = controller.findDeviceById(id);
-            showInfo(d == null ? "Not Found" : "Device Found",
-                    d == null ? "No device with ID " + id : d.toString());
+            if (d == null) {
+                showError("Not Found", "No device with ID: " + id);
+            } else {
+                showInfo("Device Found", d.toString());
+            }
         });
     }
 
@@ -354,8 +339,14 @@ public class DashboardPageController implements Initializable {
     private void scheduleDevice(Schedulable device) {
         TextInputDialog dialog = new TextInputDialog("18:00");
         dialog.setHeaderText("Schedule (HH:mm)");
-        dialog.showAndWait().ifPresent(time ->
-                scheduler.scheduleDevice(device, time, "GUI"));
+
+        dialog.showAndWait().ifPresent(time -> {
+            try {
+                scheduler.scheduleDevice(device, time, "GUI");
+            } catch (Exception e) {
+                showError("Scheduling Error", "Invalid time format. Use HH:mm");
+            }
+        });
     }
 
     // =====================================================
@@ -385,10 +376,20 @@ public class DashboardPageController implements Initializable {
         return false;
     }
 
+    // =====================================================
+    // ================= UI HELPERS ========================
+    // =====================================================
     private void showInfo(String title, String msg) {
-        Alert a = new Alert(Alert.AlertType.INFORMATION, msg);
-        a.setTitle(title);
-        a.showAndWait();
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, msg);
+        alert.setTitle(title);
+        alert.showAndWait();
+    }
+
+    private void showError(String title, String msg) {
+        Alert alert = new Alert(Alert.AlertType.ERROR, msg);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.showAndWait();
     }
 
     @FunctionalInterface
