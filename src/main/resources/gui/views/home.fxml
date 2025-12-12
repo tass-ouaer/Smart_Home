@@ -6,41 +6,74 @@
 <VBox xmlns="http://javafx.com/javafx/17"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.example.gui.controllers.DashboardPageController"
-      spacing="15"
-      style="-fx-background-color:#0f172a; -fx-padding:20">
+      spacing="18"
+      style="
+          -fx-background-color: linear-gradient(to bottom, #0f172a, #020617);
+          -fx-padding:25;
+          -fx-font-family: 'Segoe UI';
+      ">
 
-    <!-- TOP ACTION BAR -->
-    <HBox spacing="10">
-        <Button fx:id="addRoomBtn" text="+ Add Room"/>
-        <Button fx:id="removeRoomBtn" text="Remove Room"/>
-        <Button fx:id="listAllDevicesBtn" text="List All Devices"/>
-        <Button fx:id="findDeviceBtn" text="Find Device by ID"/>
+    <!-- ================= TOP ACTION BAR ================= -->
+    <HBox spacing="12"
+          style="
+              -fx-background-color:#020617;
+              -fx-padding:12;
+              -fx-background-radius:12;
+          ">
+        <Button fx:id="addRoomBtn" text="+ Add Room"
+                style="-fx-background-color:#22c55e; -fx-text-fill:white; -fx-font-weight:bold;"/>
+        <Button fx:id="removeRoomBtn" text="Remove Room"
+                style="-fx-background-color:#ef4444; -fx-text-fill:white; -fx-font-weight:bold;"/>
+        <Button fx:id="listAllDevicesBtn" text="List All Devices"
+                style="-fx-background-color:#3b82f6; -fx-text-fill:white;"/>
+        <Button fx:id="findDeviceBtn" text="Find Device by ID"
+                style="-fx-background-color:#6366f1; -fx-text-fill:white;"/>
     </HBox>
 
-    <!-- STATS -->
-    <HBox spacing="20">
-        <Label text="Rooms:"/>
-        <Label fx:id="roomCountLabel"/>
+    <!-- ================= STATS ================= -->
+    <HBox spacing="25"
+          style="
+              -fx-background-color:#020617;
+              -fx-padding:15;
+              -fx-background-radius:12;
+          ">
+        <Label text="Rooms:" style="-fx-text-fill:#94a3b8;"/>
+        <Label fx:id="roomCountLabel" style="-fx-text-fill:white; -fx-font-weight:bold;"/>
 
-        <Label text="Devices:"/>
-        <Label fx:id="deviceCountLabel"/>
+        <Label text="Devices:" style="-fx-text-fill:#94a3b8;"/>
+        <Label fx:id="deviceCountLabel" style="-fx-text-fill:white; -fx-font-weight:bold;"/>
 
-        <Label fx:id="deviceStatusLabel"/>
-        <Label fx:id="energyUsageLabel"/>
-        <Label fx:id="securityStatusLabel"/>
+        <Label fx:id="deviceStatusLabel" style="-fx-text-fill:#38bdf8;"/>
+        <Label fx:id="energyUsageLabel" style="-fx-text-fill:#facc15;"/>
+        <Label fx:id="securityStatusLabel" style="-fx-text-fill:#22c55e; -fx-font-weight:bold;"/>
     </HBox>
 
-    <!-- QUICK ACTIONS -->
-    <HBox spacing="10">
-        <Button fx:id="allLightsOnBtn" text="All Lights ON"/>
-        <Button fx:id="allLightsOffBtn" text="All Lights OFF"/>
-        <Button fx:id="lockAllDoorsBtn" text="Lock All Doors"/>
-        <Button fx:id="awayModeBtn" text="Away Mode"/>
+    <!-- ================= QUICK ACTIONS ================= -->
+    <HBox spacing="12"
+          style="
+              -fx-background-color:#020617;
+              -fx-padding:12;
+              -fx-background-radius:12;
+          ">
+        <Button fx:id="allLightsOnBtn" text="All Lights ON"
+                style="-fx-background-color:#fde047; -fx-text-fill:black;"/>
+        <Button fx:id="allLightsOffBtn" text="All Lights OFF"
+                style="-fx-background-color:#e5e7eb; -fx-text-fill:black;"/>
+        <Button fx:id="lockAllDoorsBtn" text="Lock All Doors"
+                style="-fx-background-color:#f97316; -fx-text-fill:white;"/>
+        <Button fx:id="awayModeBtn" text="Away Mode"
+                style="-fx-background-color:#8b5cf6; -fx-text-fill:white;"/>
     </HBox>
 
-    <!-- ROOMS -->
-    <ScrollPane fitToWidth="true">
-        <VBox fx:id="roomsContainer" spacing="15"/>
+    <!-- ================= ROOMS ================= -->
+    <ScrollPane fitToWidth="true"
+                style="
+                    -fx-background:#020617;
+                    -fx-border-color:transparent;
+                ">
+        <VBox fx:id="roomsContainer"
+              spacing="18"
+              style="-fx-padding:10;"/>
     </ScrollPane>
 
 </VBox>
