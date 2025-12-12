@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TabPane prefHeight="1050.0" prefWidth="995.0" style="-fx-background-color: #0f172a;" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="smarthome.gui.controllers.MainController">
+<TabPane prefHeight="1050.0" prefWidth="995.0" style="-fx-background-color: #0f172a;" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Smart_Home.gui.controllers.MainController">
 
     <!-- DASHBOARD TAB -->
     <Tab text="🏠 Dashboard">

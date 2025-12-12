@@ -1,4 +1,4 @@
-package smarthome.gui.controllers;
+package org.example.gui.controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -9,7 +9,7 @@ import javafx.beans.property.*;
 import java.net.URL;
 import java.util.*;
 
-public class MainController implements Initializable {
+public class DashboardPageController implements Initializable {
     
     // =========== DYNAMIC NAVIGATION ===========
     @FXML private VBox roomNavBox;

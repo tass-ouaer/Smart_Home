@@ -78,7 +78,7 @@ public class SmartDoorLock extends SmartDevice implements Schedulable {
         turnOff();
     }
 
-    public boolean unlock(String code) {
+    public boolean unlock() {
         if (verifyAccessCode(code)) {
             turnOn();
             return true;
