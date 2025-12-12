@@ -65,14 +65,18 @@ public class Scheduler {
         Objects.requireNonNull(device, "Schedulable device cannot be null");
         Objects.requireNonNull(time, "Time cannot be null");
 
-        LocalTime.parse(time, timeFormatter); // validate format, will throw if invalid
+        // Validate time format HH:mm
+        LocalTime.parse(time, timeFormatter);
 
+        // Only STORE the schedule in the device (no action yet)
         device.schedule(time);
-        ScheduledEntry entry = new ScheduledEntry(device, time, action);
-        tasks.add(entry);
+
+        // Store execution task
+        tasks.add(new ScheduledEntry(device, time, action));
 
         System.out.println("[Scheduler] Task added at " + time + " (" + action + ")");
     }
+
 
     /**
      * Remove all scheduled entries for a given device.
@@ -100,17 +104,28 @@ public class Scheduler {
      */
     public void runDueTasks() {
         LocalTime now = LocalTime.now();
-        String nowString = now.format(timeFormatter);
 
         for (ScheduledEntry entry : tasks) {
+
             if (entry.getTime().getHour() == now.getHour()
                     && entry.getTime().getMinute() == now.getMinute()) {
+
                 System.out.println("[Scheduler] Executing task scheduled at "
                         + entry.getTimeString() + " (" + entry.getAction() + ")");
-                entry.getTarget().schedule(nowString);
+
+                // 🔥 REAL EXECUTION
+                if (entry.getTarget() instanceof org.example.backend.devices.SmartDevice device) {
+
+                    switch (entry.getAction().toUpperCase()) {
+                        case "ON" -> device.turnOn();
+                        case "OFF" -> device.turnOff();
+                        default -> device.turnOn(); // DEFAULT behavior
+                    }
+                }
             }
         }
     }
+
 
     /**
      * Simple debug helper to print all scheduled tasks.

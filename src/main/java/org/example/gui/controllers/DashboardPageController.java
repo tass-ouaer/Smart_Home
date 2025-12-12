@@ -5,6 +5,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.geometry.Insets;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 
 import org.example.backend.home.*;
 import org.example.backend.devices.*;
@@ -48,6 +51,22 @@ public class DashboardPageController implements Initializable {
         setupActions();
         renderRooms();
         updateDashboardStats();
+        startSchedulerLoop();
+        new Thread(() -> {
+            while (true) {
+                scheduler.runDueTasks();
+
+                // 🔥 FORCE GUI REFRESH ON FX THREAD
+                javafx.application.Platform.runLater(() -> {
+                    renderRooms();
+                    updateDashboardStats();
+                });
+
+                try {
+                    Thread.sleep(60_000); // every minute
+                } catch (InterruptedException ignored) {}
+            }
+        }).start();
     }
 
     // =====================================================
@@ -88,11 +107,18 @@ public class DashboardPageController implements Initializable {
     private HBox createDeviceRow(Room room, SmartDevice device) {
         HBox row = new HBox(10);
 
-        Label info = new Label(
-                device.getDeviceName() +
-                        " | ID: " + device.getDeviceId() +
-                        " | " + device.getStatus()
-        );
+        String text = device.getDeviceName() +
+                " | ID: " + device.getDeviceId() +
+                " | " + device.getStatus();
+
+        if (device instanceof Thermostat t && t.getScheduledTime() != null) {
+            text += " | Scheduled: " + t.getScheduledTime();
+        }
+        if (device instanceof Sprinkler s && s.getScheduledTime() != null) {
+            text += " | Scheduled: " + s.getScheduledTime();
+        }
+
+        Label info = new Label(text);
         info.setStyle("-fx-text-fill:#cbd5f5;");
 
         ToggleButton toggle = new ToggleButton(device.isOn() ? "ON" : "OFF");
@@ -107,17 +133,42 @@ public class DashboardPageController implements Initializable {
 
         row.getChildren().addAll(info, toggle);
 
-        // Thermostat controls
+        // ================= THERMOSTAT CONTROLS =================
         if (device instanceof Thermostat thermostat) {
             Button minus = new Button("−");
             Button plus = new Button("+");
-            minus.setOnAction(e -> thermostat.decreaseTemperature());
-            plus.setOnAction(e -> thermostat.increaseTemperature());
-
             Button scheduleBtn = new Button("Schedule");
-            scheduleBtn.setOnAction(e -> scheduleDevice(thermostat));
+
+            minus.setOnAction(e -> {
+                thermostat.decreaseTemperature();
+                renderRooms();
+                updateDashboardStats();
+            });
+
+            plus.setOnAction(e -> {
+                thermostat.increaseTemperature();
+                renderRooms();
+                updateDashboardStats();
+            });
+
+            scheduleBtn.setOnAction(e -> {
+                scheduleDevice(thermostat);
+                renderRooms();
+            });
 
             row.getChildren().addAll(minus, plus, scheduleBtn);
+        }
+
+        // ================= SPRINKLER CONTROLS =================
+        if (device instanceof Sprinkler sprinkler) {
+            Button scheduleBtn = new Button("Schedule");
+
+            scheduleBtn.setOnAction(e -> {
+                scheduleDevice(sprinkler);
+                renderRooms();
+            });
+
+            row.getChildren().add(scheduleBtn);
         }
 
         return row;
@@ -126,6 +177,13 @@ public class DashboardPageController implements Initializable {
     // =====================================================
     // ================= ACTIONS ===========================
     // =====================================================
+    private void startSchedulerLoop() {
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.seconds(30), e -> scheduler.runDueTasks())
+        );
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+    }
     private void setupActions() {
 
         allLightsOnBtn.setOnAction(e ->
@@ -184,25 +242,52 @@ public class DashboardPageController implements Initializable {
     // ================= DEVICE OPS ========================
     // =====================================================
     private void addDevice(Room room) {
-        ChoiceDialog<String> dialog =
-                new ChoiceDialog<>("Light", "Light", "Thermostat", "SmartDoorLock");
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(
+                "Light",
+                "Light",
+                "Thermostat",
+                "SmartDoorLock",
+                "SmartTV",
+                "Sprinkler",
+                "MotionSensor",
+                "IntrusionSensor",
+                "GasDetector",
+                "GarageDoor"
+        );
 
         dialog.setHeaderText("Select device type");
         dialog.showAndWait().ifPresent(type -> {
 
             String id = room.getRoomName().toLowerCase() + "_" + System.nanoTime();
+            SmartDevice device;
 
-            SmartDevice device = switch (type) {
-                case "Thermostat" -> new Thermostat(id, "Thermostat", room.getRoomName());
-                case "SmartDoorLock" -> new SmartDoorLock(id, "Door Lock", room.getRoomName());
-                default -> new Light(id, "Light", room.getRoomName());
-            };
+            switch (type) {
+                case "Thermostat" ->
+                        device = new Thermostat(id, "Thermostat", room.getRoomName());
+                case "SmartDoorLock" ->
+                        device = new SmartDoorLock(id, "Door Lock", room.getRoomName());
+                case "SmartTV" ->
+                        device = new SmartTV(id, "Smart TV", room.getRoomName());
+                case "Sprinkler" ->
+                        device = new Sprinkler(id, "Sprinkler", room.getRoomName());
+                case "MotionSensor" ->
+                        device = new MotionSensor(id, "Motion Sensor", room.getRoomName());
+                case "IntrusionSensor" ->
+                        device = new IntrusionSensor(id, "Intrusion Sensor", room.getRoomName());
+                case "GasDetector" ->
+                        device = new GasDetector(id, "Gas Detector", room.getRoomName());
+                case "GarageDoor" ->
+                        device = new GarageDoor(id, "Garage Door", room.getRoomName());
+                default ->
+                        device = new Light(id, "Light", room.getRoomName());
+            }
 
             controller.addDeviceToRoom(room.getRoomName(), device);
             renderRooms();
             updateDashboardStats();
         });
     }
+
 
     private void removeDevice(Room room) {
         TextInputDialog dialog = new TextInputDialog();
