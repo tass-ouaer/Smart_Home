@@ -29,16 +29,28 @@ public class MotionRule extends AutomationRule {
         if (target == null) return;
 
         String motion = sensor.readValue();
+        long now = System.currentTimeMillis();
+
+        // Initialize timestamp on first run
+        if (lastMotionTimestamp == 0) {
+            lastMotionTimestamp = now;
+        }
 
         if ("motion".equalsIgnoreCase(motion)) {
-            lastMotionTimestamp = System.currentTimeMillis();
-            if (!target.isOn()) target.turnOn();
-        } else {
-            long noMotionTime =
-                    (System.currentTimeMillis() - lastMotionTimestamp) / 1000;
+            lastMotionTimestamp = now;
 
-            if (noMotionTime >= offDelaySeconds && target.isOn()) {
-                target.turnOff();
+            // 🔓 MOTION → UNLOCK DOOR
+            if (target.isOn()) {   // if currently locked
+                target.turnOff();  // unlock
+            }
+
+        } else {
+            long noMotionSeconds = (now - lastMotionTimestamp) / 1000;
+
+            // 🔒 NO MOTION → LOCK DOOR
+            if (noMotionSeconds >= offDelaySeconds && !target.isOn()) {
+                target.turnOn();   // lock
             }
         }
     }}
+

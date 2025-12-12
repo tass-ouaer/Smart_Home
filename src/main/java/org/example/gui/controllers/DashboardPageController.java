@@ -8,6 +8,9 @@ import javafx.geometry.Insets;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
+import org.example.backend.automation.*;
+
+import java.time.LocalTime;
 
 import org.example.backend.home.*;
 import org.example.backend.devices.*;
@@ -39,6 +42,7 @@ public class DashboardPageController implements Initializable {
     @FXML private Button removeRoomBtn;
 
     // ================= BACKEND =================
+    private AutomationEngine automationEngine;
     private CentralController controller;
     private Scheduler scheduler;
 
@@ -47,6 +51,34 @@ public class DashboardPageController implements Initializable {
         Home home = HomeFactory.createDefaultHome();
         controller = new CentralController(home);
         scheduler = new Scheduler();
+        automationEngine = new AutomationEngine(controller);
+
+// Register rules
+        automationEngine.addRule(new TemperatureRule("Temp Control", 20.0, 24.0));
+        automationEngine.addRule(new MotionRule(
+                "Entry Hall Motion Lock",
+                "motion_entry",     // motion sensor in entry hall
+                "front_door",       // smart door lock
+                60                // seconds without motion → lock
+        ));
+
+        automationEngine.addRule(new LockRule(
+                "Night Lock",
+                "front_door",
+                java.time.LocalTime.of(22, 0),
+                java.time.LocalTime.of(6, 0)
+        ));
+        Timeline automationLoop = new Timeline(
+                new KeyFrame(javafx.util.Duration.seconds(5), e -> {
+                    automationEngine.run();
+                    renderRooms();
+                    updateDashboardStats();
+                })
+        );
+        automationLoop.setCycleCount(Timeline.INDEFINITE);
+        automationLoop.play();
+
+
 
         setupActions();
         renderRooms();
@@ -78,6 +110,7 @@ public class DashboardPageController implements Initializable {
             roomsContainer.getChildren().add(createRoomCard(room));
         }
     }
+
 
     private VBox createRoomCard(Room room) {
         VBox card = new VBox(10);
