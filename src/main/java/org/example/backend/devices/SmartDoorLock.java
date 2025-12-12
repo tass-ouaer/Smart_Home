@@ -78,7 +78,7 @@ public class SmartDoorLock extends SmartDevice implements Schedulable {
         turnOff();
     }
 
-    public boolean unlock() {
+    public boolean unlock(String code) {
         if (verifyAccessCode(code)) {
             turnOn();
             return true;
@@ -87,6 +87,7 @@ public class SmartDoorLock extends SmartDevice implements Schedulable {
         System.out.println("Access denied - Incorrect code for " + deviceName);
         return false;
     }
+
 
     private boolean verifyAccessCode(String code) {
         return this.accessCode.equals(code);

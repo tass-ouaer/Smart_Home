@@ -1,4 +1,4 @@
-package smarthome.gui;
+package org.example.gui;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -9,7 +9,10 @@ public class MainApp extends Application {
     
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainView.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/views/home.fxml"));
+
+
+
         Scene scene = new Scene(loader.load(), 1200, 800);
         
         primaryStage.setTitle("Smart Home Control");
