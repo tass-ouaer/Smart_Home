@@ -1,49 +1,101 @@
 package org.example.backend.devices;
 
-import org.example.backend.home.Room;
+import org.example.backend.interfaces.Controllable;
+import org.example.backend.interfaces.EnergyConsumer;
 
-public class SmartDevice {
+public abstract class SmartDevice implements Controllable, EnergyConsumer {
 
-    // --------- FIELDS ----------
-    private String deviceId;
-    private String name;
-    private boolean isOn;
-    private Room room;
+    protected String deviceId;
+    protected String deviceName;
+    protected String location;
+    protected boolean isOn;
 
-    // --------- CONSTRUCTOR ----------
-    public SmartDevice(String deviceId, String name) {
+    protected double powerRating; // watts
+    private long lastOnTimestamp;
+    private long totalOnDuration;
+
+    public SmartDevice(String deviceId, String deviceName, String location) {
         this.deviceId = deviceId;
-        this.name = name;
-        this.isOn = false;   // device is OFF by default
-        this.room = null;    // no room yet
-    }
+        this.deviceName = deviceName;
+        this.location = location;
 
-    // --------- COMMON METHODS ----------
-    public void turnOn() {
-        this.isOn = true;
-    }
-
-    public void turnOff() {
         this.isOn = false;
+        this.powerRating = 0.0;
+
+        this.lastOnTimestamp = 0;
+        this.totalOnDuration = 0;
     }
 
-    public String getStatus() {
-        return isOn ? "ON" : "OFF";
+    // -----------------------------------------------------------
+    // ABSTRACT METHODS
+    // -----------------------------------------------------------
+    public abstract void turnOn();
+    public abstract void turnOff();
+    public abstract String getDeviceType();
+    public abstract String getStatus();
+
+    // -----------------------------------------------------------
+    // TIME TRACKING
+    // -----------------------------------------------------------
+    protected void startTimeTracking() {
+        if (!isOn) {
+            lastOnTimestamp = System.currentTimeMillis();
+        }
     }
 
-    public String getName() {
-        return name;
+    protected void stopTimeTracking() {
+        if (isOn && lastOnTimestamp > 0) {
+            totalOnDuration += System.currentTimeMillis() - lastOnTimestamp;
+        }
     }
 
-    public String getDeviceId() {
-        return deviceId;
+    @Override
+    public long getOnDurationSeconds() {
+        long duration = totalOnDuration;
+
+        if (isOn && lastOnTimestamp > 0) {
+            duration += System.currentTimeMillis() - lastOnTimestamp;
+        }
+
+        return duration / 1000;
     }
 
-    public void setRoom(Room room) {
-        this.room = room;
+    // -----------------------------------------------------------
+    // EnergyConsumer Interface
+    // -----------------------------------------------------------
+    @Override
+    public double getPowerRating() {
+        return powerRating;
     }
 
-    public Room getRoom() {
-        return room;
+    public void setPowerRating(double rating) {
+        this.powerRating = rating;
+    }
+
+    @Override
+    public double getEnergyConsumption() {
+        // energy already consumed (kWh)
+        return (powerRating * getOnDurationSeconds()) / (1000.0 * 3600.0);
+    }
+
+    @Override
+    public double calculateEnergyUsage(double hours) {
+        return (powerRating / 1000.0) * hours;
+    }
+
+    // -----------------------------------------------------------
+    // GETTERS / SETTERS
+    // -----------------------------------------------------------
+    public String getDeviceId() { return deviceId; }
+    public String getDeviceName() { return deviceName; }
+    public String getLocation() { return location; }
+    public boolean isOn() { return isOn; }
+
+    public void setDeviceName(String deviceName) { this.deviceName = deviceName; }
+    public void setLocation(String location) { this.location = location; }
+
+    @Override
+    public String toString() {
+        return deviceName + " (" + getDeviceType() + ") - " + (isOn ? "ON" : "OFF");
     }
 }
