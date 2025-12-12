@@ -22,18 +22,23 @@ public class MotionRule extends AutomationRule {
     public void apply(CentralController controller) {
         if (!isActive) return;
 
-        String motion = controller.readSensorValue(null, motionSensorId);
-        SmartDevice target = controller.findDeviceById(targetDeviceId);
-        if (motion == null || target == null) return;
+        SmartDevice sensorDevice = controller.findDeviceById(motionSensorId);
+        if (!(sensorDevice instanceof SensorDevice sensor)) return;
 
-        if (motion.equalsIgnoreCase("motion")) {
+        SmartDevice target = controller.findDeviceById(targetDeviceId);
+        if (target == null) return;
+
+        String motion = sensor.readValue();
+
+        if ("motion".equalsIgnoreCase(motion)) {
             lastMotionTimestamp = System.currentTimeMillis();
             if (!target.isOn()) target.turnOn();
         } else {
-            long noMotionTime = (System.currentTimeMillis() - lastMotionTimestamp) / 1000;
+            long noMotionTime =
+                    (System.currentTimeMillis() - lastMotionTimestamp) / 1000;
+
             if (noMotionTime >= offDelaySeconds && target.isOn()) {
                 target.turnOff();
             }
         }
-    }
-}
+    }}
