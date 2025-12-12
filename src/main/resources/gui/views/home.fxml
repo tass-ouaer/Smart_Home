@@ -2,77 +2,45 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
 
-<VBox prefWidth="1200" prefHeight="800"
-      xmlns="http://javafx.com/javafx/17"
+<VBox xmlns="http://javafx.com/javafx/17"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.example.gui.controllers.DashboardPageController"
-      style="-fx-background-color: #0f172a; -fx-padding: 20;">
+      spacing="15"
+      style="-fx-background-color:#0f172a; -fx-padding:20">
 
-    <!-- ================= HEADER ================= -->
-    <HBox spacing="40" alignment="CENTER_LEFT" style="-fx-padding: 0 0 20 0;">
-
-        <!-- Rooms -->
-        <VBox spacing="5">
-            <Label text="Rooms" style="-fx-text-fill:#94a3b8;"/>
-            <Label fx:id="roomCountLabel"
-                   style="-fx-text-fill:white; -fx-font-size:26; -fx-font-weight:bold;"/>
-        </VBox>
-
-        <!-- Devices -->
-        <VBox spacing="5">
-            <Label text="Devices" style="-fx-text-fill:#94a3b8;"/>
-            <HBox spacing="10">
-                <Label fx:id="deviceCountLabel"
-                       style="-fx-text-fill:white; -fx-font-size:26; -fx-font-weight:bold;"/>
-                <Label fx:id="deviceStatusLabel"
-                       style="-fx-text-fill:#10b981;"/>
-            </HBox>
-        </VBox>
-
-        <!-- Security -->
-        <VBox spacing="5">
-            <Label text="Security" style="-fx-text-fill:#94a3b8;"/>
-            <Label fx:id="securityStatusLabel"
-                   style="-fx-text-fill:white; -fx-font-size:18; -fx-font-weight:bold;"/>
-        </VBox>
-
-        <!-- Energy -->
-        <VBox spacing="5">
-            <Label text="Energy" style="-fx-text-fill:#94a3b8;"/>
-            <Label fx:id="energyUsageLabel"
-                   style="-fx-text-fill:white; -fx-font-size:18;"/>
-        </VBox>
-
+    <!-- TOP ACTION BAR -->
+    <HBox spacing="10">
+        <Button fx:id="addRoomBtn" text="+ Add Room"/>
+        <Button fx:id="removeRoomBtn" text="Remove Room"/>
+        <Button fx:id="listAllDevicesBtn" text="List All Devices"/>
+        <Button fx:id="findDeviceBtn" text="Find Device by ID"/>
     </HBox>
 
-    <!-- ================= QUICK ACTIONS ================= -->
-    <HBox spacing="15" style="-fx-padding: 10 0 20 0;">
-        <Button fx:id="allLightsOnBtn"
-                text="💡 All Lights ON"
-                style="-fx-background-color:#059669; -fx-text-fill:white; -fx-font-weight:bold;"/>
+    <!-- STATS -->
+    <HBox spacing="20">
+        <Label text="Rooms:"/>
+        <Label fx:id="roomCountLabel"/>
 
-        <Button fx:id="allLightsOffBtn"
-                text="💡 All Lights OFF"
-                style="-fx-background-color:#dc2626; -fx-text-fill:white; -fx-font-weight:bold;"/>
+        <Label text="Devices:"/>
+        <Label fx:id="deviceCountLabel"/>
 
-        <Button fx:id="lockAllDoorsBtn"
-                text="🔒 Lock All Doors"
-                style="-fx-background-color:#3b82f6; -fx-text-fill:white; -fx-font-weight:bold;"/>
-
-        <Button fx:id="awayModeBtn"
-                text="🏠 Away Mode"
-                style="-fx-background-color:#8b5cf6; -fx-text-fill:white; -fx-font-weight:bold;"/>
+        <Label fx:id="deviceStatusLabel"/>
+        <Label fx:id="energyUsageLabel"/>
+        <Label fx:id="securityStatusLabel"/>
     </HBox>
 
-    <!-- ================= ROOMS (DYNAMIC) ================= -->
-    <ScrollPane fitToWidth="true" style="-fx-background-color:transparent;">
-        <VBox fx:id="roomsContainer"
-              spacing="20"
-              style="-fx-padding:10;">
-            <!-- Rooms injected dynamically -->
-        </VBox>
+    <!-- QUICK ACTIONS -->
+    <HBox spacing="10">
+        <Button fx:id="allLightsOnBtn" text="All Lights ON"/>
+        <Button fx:id="allLightsOffBtn" text="All Lights OFF"/>
+        <Button fx:id="lockAllDoorsBtn" text="Lock All Doors"/>
+        <Button fx:id="awayModeBtn" text="Away Mode"/>
+    </HBox>
+
+    <!-- ROOMS -->
+    <ScrollPane fitToWidth="true">
+        <VBox fx:id="roomsContainer" spacing="15"/>
     </ScrollPane>
 
 </VBox>
