@@ -1,598 +1,235 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TabPane prefHeight="1050.0" prefWidth="995.0" style="-fx-background-color: #0f172a;" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Smart_Home.gui.controllers.MainController">
+<VBox prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: #0f172a; -fx-padding: 20;"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.gui.controllers.DashboardPageController">
 
-    <!-- DASHBOARD TAB -->
-    <Tab text="🏠 Dashboard">
-        <content>
-            <ScrollPane fitToWidth="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1503.0" prefWidth="955.0" style="-fx-background: #0f172a; -fx-border-color: transparent; -fx-padding: 0;">
-                <VBox prefHeight="789.0" prefWidth="954.0" spacing="30" style="-fx-padding: 30; -fx-background-color: #0f172a;">
+    <!-- DYNAMIC NAVIGATION HEADER -->
+    <HBox spacing="40" alignment="CENTER_LEFT" style="-fx-padding: 0 0 20 0;">
+        <!-- Rooms Section - Dynamic -->
+        <VBox spacing="5" fx:id="roomNavBox" onMouseClicked="#showRoomDetails" style="-fx-cursor: hand;">
+            <Label style="-fx-font-size: 14; -fx-text-fill: #94a3b8;" text="Rooms" />
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label fx:id="roomCountLabel" text="3" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" />
+                <Label style="-fx-font-size: 14; -fx-text-fill: #10b981;" text="Active" />
+            </HBox>
+            <Button fx:id="addRoomButton" text="+ Add Room"
+                    style="-fx-background-color: transparent; -fx-text-fill: #3b82f6; -fx-padding: 0; -fx-font-size: 12;" />
+        </VBox>
 
-                    <!-- HEADER -->
-                    <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="8">
-                        <Label style="-fx-font-size: 42; -fx-font-weight: bold; -fx-text-fill: #f8fafc; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 2, 2);" text="Smart Home Dashboard" />
-                        <Label style="-fx-font-size: 16; -fx-text-fill: #94a3b8; -fx-font-weight: 500;" text="Monitor and control your entire smart home ecosystem" />
-                    </VBox>
+        <!-- Devices Section - Dynamic -->
+        <VBox spacing="5" fx:id="deviceNavBox" onMouseClicked="#showDeviceList" style="-fx-cursor: hand;">
+            <Label style="-fx-font-size: 14; -fx-text-fill: #94a3b8;" text="Devices" />
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label fx:id="deviceCountLabel" text="12" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" />
+                <Label fx:id="deviceStatusLabel" text="8 Active" style="-fx-font-size: 14; -fx-text-fill: #10b981;" />
+            </HBox>
+            <Button fx:id="addDeviceButton" text="+ Add Device"
+                    style="-fx-background-color: transparent; -fx-text-fill: #3b82f6; -fx-padding: 0; -fx-font-size: 12;" />
+        </VBox>
 
-                    <!-- STATUS CARDS GRID -->
-                    <GridPane hgap="20" style="-fx-padding: 10;" vgap="20">
-                        <columnConstraints>
-                            <ColumnConstraints percentWidth="25" />
-                            <ColumnConstraints percentWidth="25" />
-                            <ColumnConstraints percentWidth="25" />
-                            <ColumnConstraints percentWidth="25" />
-                        </columnConstraints>
+        <!-- Automations Section - Dynamic -->
+        <VBox spacing="5" fx:id="automationNavBox" onMouseClicked="#showAutomationList" style="-fx-cursor: hand;">
+            <Label style="-fx-font-size: 14; -fx-text-fill: #94a3b8;" text="Automations" />
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label fx:id="automationCountLabel" text="5" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" />
+                <Label fx:id="automationStatusLabel" text="3 Running" style="-fx-font-size: 14; -fx-text-fill: #10b981;" />
+            </HBox>
+            <Button fx:id="addAutomationButton" text="+ Add Automation"
+                    style="-fx-background-color: transparent; -fx-text-fill: #3b82f6; -fx-padding: 0; -fx-font-size: 12;" />
+        </VBox>
+    </HBox>
 
-                        <!-- Security Card -->
-                        <VBox style="-fx-background-color: #1e293b; -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(220, 38, 38, 0.3), 15, 0, 0, 8);" GridPane.columnIndex="0">
-                            <VBox spacing="12">
-                                <HBox alignment="CENTER_LEFT" spacing="10">
-                                    <Label style="-fx-text-fill: #fecaca; -fx-font-size: 16; -fx-font-weight: bold;" text="🔒 SECURITY" />
-                                    <Region HBox.hgrow="ALWAYS" />
-                                    <Label fx:id="securityStatusLabel" style="-fx-text-fill: white; -fx-font-size: 12; -fx-font-weight: bold; -fx-background-color: rgba(255,255,255,0.2); -fx-background-radius: 10; -fx-padding: 4 8;" text="ARMED" />
-                                </HBox>
-                                <Label style="-fx-text-fill: white; -fx-font-size: 32; -fx-font-weight: bold;" text="Secure" />
-                                <Label style="-fx-text-fill: #fecaca; -fx-font-size: 14;" text="All systems normal" />
-                            </VBox>
-                        </VBox>
+    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+        <VBox spacing="30" style="-fx-padding: 20; -fx-background-color: #0f172a;">
 
-                        <!-- Energy Card -->
-                        <VBox style="-fx-background-color: #1e293b; -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(5, 150, 105, 0.3), 15, 0, 0, 8);" GridPane.columnIndex="1">
-                            <VBox spacing="12">
-                                <Label style="-fx-text-fill: #a7f3d0; -fx-font-size: 16; -fx-font-weight: bold;" text="⚡ ENERGY" />
-                                <Label fx:id="energyUsageLabel" style="-fx-text-fill: white; -fx-font-size: 32; -fx-font-weight: bold;" text="2.3 kWh" />
-                                <Label style="-fx-text-fill: #a7f3d0; -fx-font-size: 14;" text="Today's consumption" />
-                            </VBox>
-                        </VBox>
+            <!-- HEADER -->
+            <VBox spacing="8">
+                <Label style="-fx-font-size: 42; -fx-font-weight: bold; -fx-text-fill: #f8fafc;"
+                       text="Smart Home Dashboard" />
+                <Label style="-fx-font-size: 16; -fx-text-fill: #94a3b8; -fx-font-weight: 500;"
+                       text="Monitor and control your entire smart home ecosystem" />
+            </VBox>
 
-                        <!-- Devices Card -->
-                        <VBox style="-fx-background-color: #1e293b; -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(124, 58, 237, 0.3), 15, 0, 0, 8);" GridPane.columnIndex="2">
-                            <VBox spacing="12">
-                                <Label style="-fx-text-fill: #ddd6fe; -fx-font-size: 16; -fx-font-weight: bold;" text="📱 DEVICES" />
-                                <Label fx:id="activeDevicesLabel" style="-fx-text-fill: white; -fx-font-size: 32; -fx-font-weight: bold;" text="8/12" />
-                                <Label style="-fx-text-fill: #ddd6fe; -fx-font-size: 14;" text="Active devices" />
-                            </VBox>
-                        </VBox>
+            <!-- STATUS CARDS GRID -->
+            <GridPane hgap="20" vgap="20">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="25" />
+                    <ColumnConstraints percentWidth="25" />
+                    <ColumnConstraints percentWidth="25" />
+                    <ColumnConstraints percentWidth="25" />
+                </columnConstraints>
 
-                        <!-- Temperature Card -->
-                        <VBox style="-fx-background-color: #1e293b; -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(234, 88, 12, 0.3), 15, 0, 0, 8);" GridPane.columnIndex="3">
-                            <VBox spacing="12">
-                                <Label style="-fx-text-fill: #fed7aa; -fx-font-size: 16; -fx-font-weight: bold;" text="🌡️ TEMPERATURE" />
-                                <Label style="-fx-text-fill: white; -fx-font-size: 32; -fx-font-weight: bold;" text="22°C" />
-                                <Label style="-fx-text-fill: #fed7aa; -fx-font-size: 14;" text="Comfortable" />
-                            </VBox>
-                        </VBox>
-                        <rowConstraints>
-                            <RowConstraints />
-                        </rowConstraints>
-                    </GridPane>
-
-                    <!-- QUICK ACTIONS GRID -->
-                    <VBox spacing="15">
-                        <Label style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" text="Quick Actions" />
-                        <GridPane hgap="15" vgap="15">
-                            <columnConstraints>
-                                <ColumnConstraints percentWidth="25" />
-                                <ColumnConstraints percentWidth="25" />
-                                <ColumnConstraints percentWidth="25" />
-                                <ColumnConstraints percentWidth="25" />
-                            </columnConstraints>
-
-                            <Button fx:id="allLightsOnBtn" mnemonicParsing="false" onAction="#turnAllLightsOn" style="-fx-background-color: #1e3b20; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-radius: 15; -fx-padding: 20 15; -fx-pref-height: 80; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 4);" text="💡 All Lights ON" textFill="#1e3b20" GridPane.columnIndex="0" />
-                            <Button fx:id="allLightsOffBtn" mnemonicParsing="false" onAction="#turnAllLightsOff" style="-fx-background-color: #662222; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-radius: 15; -fx-padding: 20 15; -fx-pref-height: 80; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 4);" text="💡 All Lights OFF" textFill="#662222" GridPane.columnIndex="1" />
-                            <Button fx:id="securityModeBtn" mnemonicParsing="false" onAction="#toggleSecurityMode" style="-fx-background-color: #615931; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-radius: 15; -fx-padding: 20 15; -fx-pref-height: 80; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 4);" text="🔒 Security Mode" textFill="#615931" GridPane.columnIndex="2" />
-                            <Button fx:id="awayModeBtn" mnemonicParsing="false" onAction="#activateAwayMode" style="-fx-background-color: #d9bed3; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-radius: 15; -fx-padding: 20 15; -fx-pref-height: 80; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 4);" text="🏠 Away Mode" textFill="#d9bed3" GridPane.columnIndex="3" />
-                            <rowConstraints>
-                                <RowConstraints />
-                            </rowConstraints>
-                        </GridPane>
-                    </VBox>
-
-                    <!-- ROOMS GRID -->
-                    <VBox spacing="20">
-                        <HBox alignment="CENTER_LEFT" spacing="15">
-                            <Label style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" text="Rooms Control" />
-                            <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14; -fx-background-color: #1e293b; -fx-background-radius: 10; -fx-padding: 4 12;" text="6 rooms • 12 devices" />
+                <!-- Security Card -->
+                <VBox style="-fx-background-color: #1e293b; -fx-background-radius: 20; -fx-padding: 25;" GridPane.columnIndex="0">
+                    <VBox spacing="12">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label style="-fx-text-fill: #fecaca; -fx-font-size: 16; -fx-font-weight: bold;" text="🔒 SECURITY" />
+                            <Label fx:id="securityStatusLabel" style="-fx-text-fill: white; -fx-font-size: 12; -fx-font-weight: bold; -fx-background-color: #dc2626; -fx-background-radius: 10; -fx-padding: 4 8;" text="ARMED" />
                         </HBox>
-
-                        <GridPane hgap="20" vgap="20">
-                            <columnConstraints>
-                                <ColumnConstraints percentWidth="33" />
-                                <ColumnConstraints percentWidth="33" />
-                                <ColumnConstraints percentWidth="33" />
-                            </columnConstraints>
-
-                            <!-- Living Room Card -->
-                            <VBox style="-fx-background-color: #1e293b; -fx-background-radius: 20; -fx-padding: 25; -fx-border-color: #334155; -fx-border-radius: 20; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5);" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                <VBox spacing="15">
-                                    <HBox alignment="CENTER_LEFT" spacing="10">
-                                        <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" text="🏠 Living Room" />
-                                        <Region HBox.hgrow="ALWAYS" />
-                                        <Label style="-fx-text-fill: #64748b; -fx-font-size: 12; -fx-background-color: #334155; -fx-background-radius: 8; -fx-padding: 2 8;" text="2 devices" />
-                                    </HBox>
-
-                                    <VBox spacing="12">
-                                        <HBox alignment="CENTER_LEFT" spacing="10">
-                                            <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14; -fx-pref-width: 60;" text="Light:" />
-                                            <ToggleButton fx:id="livingRoomLightBtn" mnemonicParsing="false" onAction="#toggleLivingRoomLight" style="-fx-background-radius: 15; -fx-pref-width: 90; -fx-pref-height: 35; -fx-font-weight: bold; -fx-background-color: #374151; -fx-text-fill: #9ca3af;" text="OFF" />
-                                        </HBox>
-                                        <HBox alignment="CENTER_LEFT" spacing="10">
-                                            <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14; -fx-pref-width: 60;" text="TV:" />
-                                            <ToggleButton fx:id="livingRoomTVBtn" mnemonicParsing="false" onAction="#toggleLivingRoomTV" style="-fx-background-radius: 15; -fx-pref-width: 90; -fx-pref-height: 35; -fx-font-weight: bold; -fx-background-color: #374151; -fx-text-fill: #9ca3af;" text="OFF" />
-                                        </HBox>
-                                    </VBox>
-                                </VBox>
-                            </VBox>
-
-                            <!-- Kitchen Card -->
-                            <VBox style="-fx-background-color: #1e293b; -fx-background-radius: 20; -fx-padding: 25; -fx-border-color: #334155; -fx-border-radius: 20; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5);" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                <VBox spacing="15">
-                                    <HBox alignment="CENTER_LEFT" spacing="10">
-                                        <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" text="🍳 Kitchen" />
-                                        <Region HBox.hgrow="ALWAYS" />
-                                        <Label style="-fx-text-fill: #64748b; -fx-font-size: 12; -fx-background-color: #334155; -fx-background-radius: 8; -fx-padding: 2 8;" text="2 devices" />
-                                    </HBox>
-
-                                    <VBox spacing="12">
-                                        <HBox alignment="CENTER_LEFT" spacing="10">
-                                            <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14; -fx-pref-width: 60;" text="Light:" />
-                                            <ToggleButton fx:id="kitchenLightBtn" mnemonicParsing="false" onAction="#toggleKitchenLight" style="-fx-background-radius: 15; -fx-pref-width: 90; -fx-pref-height: 35; -fx-font-weight: bold; -fx-background-color: #374151; -fx-text-fill: #9ca3af;" text="OFF" />
-                                        </HBox>
-                                        <HBox alignment="CENTER_LEFT" spacing="10">
-                                            <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14; -fx-pref-width: 100;" text="Gas Detector:" />
-                                            <Label fx:id="kitchenGasStatus" style="-fx-text-fill: #10b981; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-color: #065f46; -fx-background-radius: 8; -fx-padding: 4 8;" text="SAFE" />
-                                        </HBox>
-                                    </VBox>
-                                </VBox>
-                            </VBox>
-
-                            <!-- Entry Door Card -->
-                            <VBox style="-fx-background-color: #1e293b; -fx-background-radius: 20; -fx-padding: 25; -fx-border-color: #334155; -fx-border-radius: 20; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5);" GridPane.columnIndex="2" GridPane.rowIndex="0">
-                                <VBox spacing="15">
-                                    <HBox alignment="CENTER_LEFT" spacing="10">
-                                        <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" text="🚪 Entry Door" />
-                                        <Region HBox.hgrow="ALWAYS" />
-                                        <Label style="-fx-text-fill: #64748b; -fx-font-size: 12; -fx-background-color: #334155; -fx-background-radius: 8; -fx-padding: 2 8;" text="2 devices" />
-                                    </HBox>
-
-                                    <VBox spacing="12">
-                                        <HBox alignment="CENTER_LEFT" spacing="10">
-                                            <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14; -fx-pref-width: 90;" text="Smart Lock:" />
-                                            <ToggleButton fx:id="entryLockBtn" mnemonicParsing="false" onAction="#toggleEntryLock" style="-fx-background-radius: 15; -fx-pref-width: 100; -fx-pref-height: 35; -fx-font-weight: bold; -fx-background-color: #374151; -fx-text-fill: #9ca3af;" text="LOCKED" />
-                                        </HBox>
-                                        <HBox alignment="CENTER_LEFT" spacing="10">
-                                            <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14; -fx-pref-width: 120;" text="Intrusion:" />
-                                            <Label fx:id="entryIntrusionStatus" style="-fx-text-fill: #10b981; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-color: #065f46; -fx-background-radius: 8; -fx-padding: 4 8;" text="NORMAL" />
-                                        </HBox>
-                                    </VBox>
-                                </VBox>
-                            </VBox>
-
-                            <!-- Garage Card -->
-                            <VBox style="-fx-background-color: #1e293b; -fx-background-radius: 20; -fx-padding: 25; -fx-border-color: #334155; -fx-border-radius: 20; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5);" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                                <VBox spacing="15">
-                                    <HBox alignment="CENTER_LEFT" spacing="10">
-                                        <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" text="🚗 Garage" />
-                                        <Region HBox.hgrow="ALWAYS" />
-                                        <Label style="-fx-text-fill: #64748b; -fx-font-size: 12; -fx-background-color: #334155; -fx-background-radius: 8; -fx-padding: 2 8;" text="1 device" />
-                                    </HBox>
-
-                                    <VBox spacing="12">
-                                        <HBox alignment="CENTER_LEFT" spacing="10">
-                                            <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14; -fx-pref-width: 100;" text="Garage Door:" />
-                                            <ToggleButton fx:id="garageDoorBtn" mnemonicParsing="false" onAction="#toggleGarageDoor" style="-fx-background-radius: 15; -fx-pref-width: 100; -fx-pref-height: 35; -fx-font-weight: bold; -fx-background-color: #374151; -fx-text-fill: #9ca3af;" text="CLOSED" />
-                                        </HBox>
-                                    </VBox>
-                                </VBox>
-                            </VBox>
-
-                            <!-- Garden Card -->
-                            <VBox style="-fx-background-color: #1e293b; -fx-background-radius: 20; -fx-padding: 25; -fx-border-color: #334155; -fx-border-radius: 20; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5);" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                <VBox spacing="15">
-                                    <HBox alignment="CENTER_LEFT" spacing="10">
-                                        <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" text="🌳 Garden" />
-                                        <Region HBox.hgrow="ALWAYS" />
-                                        <Label style="-fx-text-fill: #64748b; -fx-font-size: 12; -fx-background-color: #334155; -fx-background-radius: 8; -fx-padding: 2 8;" text="1 device" />
-                                    </HBox>
-
-                                    <VBox spacing="12">
-                                        <HBox alignment="CENTER_LEFT" spacing="10">
-                                            <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14; -fx-pref-width: 80;" text="Sprinkler:" />
-                                            <ToggleButton fx:id="gardenSprinklerBtn" mnemonicParsing="false" onAction="#toggleGardenSprinkler" style="-fx-background-radius: 15; -fx-pref-width: 80; -fx-pref-height: 35; -fx-font-weight: bold; -fx-background-color: #374151; -fx-text-fill: #9ca3af;" text="OFF" />
-                                        </HBox>
-                                    </VBox>
-                                </VBox>
-                            </VBox>
-
-                            <!-- Toilet Card -->
-                            <VBox style="-fx-background-color: #1e293b; -fx-background-radius: 20; -fx-padding: 25; -fx-border-color: #334155; -fx-border-radius: 20; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5);" GridPane.columnIndex="2" GridPane.rowIndex="1">
-                                <VBox spacing="15">
-                                    <HBox alignment="CENTER_LEFT" spacing="10">
-                                        <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" text="🚽 Toilet" />
-                                        <Region HBox.hgrow="ALWAYS" />
-                                        <Label style="-fx-text-fill: #64748b; -fx-font-size: 12; -fx-background-color: #334155; -fx-background-radius: 8; -fx-padding: 2 8;" text="2 devices" />
-                                    </HBox>
-
-                                    <VBox spacing="12">
-                                        <HBox alignment="CENTER_LEFT" spacing="10">
-                                            <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14; -fx-pref-width: 110;" text="Motion Sensor:" />
-                                            <Label fx:id="toiletMotionStatus" style="-fx-text-fill: #64748b; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-color: #374151; -fx-background-radius: 8; -fx-padding: 4 8;" text="NO MOTION" />
-                                        </HBox>
-                                        <HBox alignment="CENTER_LEFT" spacing="10">
-                                            <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14; -fx-pref-width: 80;" text="Light:" />
-                                            <Label fx:id="toiletLightStatus" style="-fx-text-fill: #3b82f6; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-color: #1e3a8a; -fx-background-radius: 8; -fx-padding: 4 8;" text="AUTO" />
-                                        </HBox>
-                                    </VBox>
-                                </VBox>
-                            </VBox>
-                            <rowConstraints>
-                                <RowConstraints />
-                                <RowConstraints />
-                            </rowConstraints>
-                        </GridPane>
+                        <Label style="-fx-text-fill: white; -fx-font-size: 32; -fx-font-weight: bold;" text="Secure" />
+                        <Label style="-fx-text-fill: #fecaca; -fx-font-size: 14;" text="All systems normal" />
                     </VBox>
                 </VBox>
-            </ScrollPane>
-        </content>
-    </Tab>
 
-    <!-- ROOMS TAB -->
-    <Tab text="🚪 Rooms">
-        <content>
-            <ScrollPane fitToWidth="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1441.0" prefWidth="920.0" style="-fx-background: #0f172a; -fx-border-color: transparent;">
-                <VBox spacing="30" style="-fx-padding: 30; -fx-background-color: #0f172a;">
-                    <!-- Header -->
-                    <VBox spacing="8">
-                        <Label style="-fx-font-size: 42; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" text="Room Management" />
-                        <Label style="-fx-font-size: 16; -fx-text-fill: #94a3b8;" text="Manage rooms and their connected devices" />
+                <!-- Energy Card -->
+                <VBox style="-fx-background-color: #1e293b; -fx-background-radius: 20; -fx-padding: 25;" GridPane.columnIndex="1">
+                    <VBox spacing="12">
+                        <Label style="-fx-text-fill: #a7f3d0; -fx-font-size: 16; -fx-font-weight: bold;" text="⚡ ENERGY" />
+                        <Label fx:id="energyUsageLabel" style="-fx-text-fill: white; -fx-font-size: 32; -fx-font-weight: bold;" text="2.3 kWh" />
+                        <Label style="-fx-text-fill: #a7f3d0; -fx-font-size: 14;" text="Today's consumption" />
                     </VBox>
+                </VBox>
 
-                    <!-- Room Selection -->
-                    <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: #1e293b; -fx-background-radius: 15; -fx-padding: 25; -fx-border-color: #334155; -fx-border-radius: 15; -fx-border-width: 1;">
-                        <ComboBox fx:id="roomSelector" prefWidth="300" promptText="Select a Room" style="-fx-background-color: #0f172a; -fx-background-radius: 10; -fx-border-color: #334155; -fx-border-radius: 10; -fx-text-fill: white; -fx-prompt-text-fill: #64748b;" />
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Button fx:id="addRoomBtn" mnemonicParsing="false" onAction="#addNewRoom" style="-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 12 24; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);" text="+ Add Room" />
+                <!-- Devices Card -->
+                <VBox style="-fx-background-color: #1e293b; -fx-background-radius: 20; -fx-padding: 25;" GridPane.columnIndex="2">
+                    <VBox spacing="12">
+                        <Label style="-fx-text-fill: #ddd6fe; -fx-font-size: 16; -fx-font-weight: bold;" text="📱 DEVICES" />
+                        <Label fx:id="activeDevicesLabel" style="-fx-text-fill: white; -fx-font-size: 32; -fx-font-weight: bold;" text="8/12" />
+                        <Label style="-fx-text-fill: #ddd6fe; -fx-font-size: 14;" text="Active devices" />
+                    </VBox>
+                </VBox>
+
+                <!-- Temperature Card -->
+                <VBox style="-fx-background-color: #1e293b; -fx-background-radius: 20; -fx-padding: 25;" GridPane.columnIndex="3">
+                    <VBox spacing="12">
+                        <Label style="-fx-text-fill: #fed7aa; -fx-font-size: 16; -fx-font-weight: bold;" text="🌡️ TEMPERATURE" />
+                        <Label style="-fx-text-fill: white; -fx-font-size: 32; -fx-font-weight: bold;" text="22°C" />
+                        <Label style="-fx-text-fill: #fed7aa; -fx-font-size: 14;" text="Comfortable" />
+                    </VBox>
+                </VBox>
+                <rowConstraints>
+                    <RowConstraints />
+                </rowConstraints>
+            </GridPane>
+
+            <!-- QUICK ACTIONS -->
+            <VBox spacing="15">
+                <Label style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" text="Quick Actions" />
+                <GridPane hgap="15" vgap="15">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="25" />
+                        <ColumnConstraints percentWidth="25" />
+                        <ColumnConstraints percentWidth="25" />
+                        <ColumnConstraints percentWidth="25" />
+                    </columnConstraints>
+
+                    <Button fx:id="allLightsOnBtn" mnemonicParsing="false" onAction="#turnAllLightsOn"
+                            style="-fx-background-color: #059669; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-radius: 15; -fx-padding: 20 15; -fx-pref-height: 80;"
+                            text="💡 All Lights ON" GridPane.columnIndex="0" />
+                    <Button fx:id="allLightsOffBtn" mnemonicParsing="false" onAction="#turnAllLightsOff"
+                            style="-fx-background-color: #dc2626; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-radius: 15; -fx-padding: 20 15; -fx-pref-height: 80;"
+                            text="💡 All Lights OFF" GridPane.columnIndex="1" />
+                    <Button fx:id="lockAllDoorsBtn" mnemonicParsing="false" onAction="#lockAllDoors"
+                            style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-radius: 15; -fx-padding: 20 15; -fx-pref-height: 80;"
+                            text="🔒 Lock All Doors" GridPane.columnIndex="2" />
+                    <Button fx:id="awayModeBtn" mnemonicParsing="false" onAction="#activateAwayMode"
+                            style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-radius: 15; -fx-padding: 20 15; -fx-pref-height: 80;"
+                            text="🏠 Away Mode" GridPane.columnIndex="3" />
+                    <rowConstraints>
+                        <RowConstraints />
+                    </rowConstraints>
+                </GridPane>
+            </VBox>
+
+            <!-- ROOMS SECTION - DYNAMIC -->
+            <VBox spacing="20">
+                <Label style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" text="Rooms" />
+
+                <!-- Room 1 - DYNAMIC CONTENT -->
+                <VBox fx:id="room1Container" spacing="15"
+                      style="-fx-background-color: #1e293b; -fx-background-radius: 15; -fx-padding: 25;">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" text="Room 1" />
+                        <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 12; -fx-background-color: #334155; -fx-background-radius: 8; -fx-padding: 2 8; -fx-margin-left: 10;" text="2 devices" />
                     </HBox>
 
-                    <!-- Room Details Grid -->
-                    <VBox fx:id="roomDetailsContainer" spacing="25" style="-fx-background-color: #1e293b; -fx-background-radius: 20; -fx-padding: 30; -fx-border-color: #334155; -fx-border-radius: 20; -fx-border-width: 1;">
-                        <HBox alignment="CENTER_LEFT" spacing="20">
-                            <VBox spacing="8">
-                                <Label fx:id="currentRoomLabel" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" text="No Room Selected" />
-                                <Label fx:id="deviceCountLabel" style="-fx-text-fill: #94a3b8; -fx-font-size: 16;" text="0 devices connected" />
-                            </VBox>
-                            <Region HBox.hgrow="ALWAYS" />
-                            <Button fx:id="editRoomBtn" mnemonicParsing="false" onAction="#editRoom" style="-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 12 24; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);" text="✏️ Edit Room" />
-                        </HBox>
-
-                        <!-- Room Statistics Grid -->
-                        <GridPane hgap="20" vgap="20">
-                            <columnConstraints>
-                                <ColumnConstraints percentWidth="33" />
-                                <ColumnConstraints percentWidth="33" />
-                                <ColumnConstraints percentWidth="33" />
-                            </columnConstraints>
-
-                            <VBox style="-fx-background-color: #0f172a; -fx-background-radius: 15; -fx-padding: 25; -fx-border-color: #334155; -fx-border-radius: 15; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, rgba(124, 58, 237, 0.3), 15, 0, 0, 8);" GridPane.columnIndex="0">
-                                <VBox spacing="8">
-                                    <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14; -fx-font-weight: bold;" text="ACTIVE DEVICES" />
-                                    <Label fx:id="activeDevicesCount" style="-fx-text-fill: #f8fafc; -fx-font-size: 32; -fx-font-weight: bold;" text="0" />
-                                </VBox>
-                            </VBox>
-
-                            <VBox style="-fx-background-color: #0f172a; -fx-background-radius: 15; -fx-padding: 25; -fx-border-color: #334155; -fx-border-radius: 15; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, rgba(124, 58, 237, 0.3), 15, 0, 0, 8);" GridPane.columnIndex="1">
-                                <VBox spacing="8">
-                                    <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14; -fx-font-weight: bold;" text="ENERGY USAGE" />
-                                    <Label fx:id="roomEnergyUsage" style="-fx-text-fill: #f8fafc; -fx-font-size: 32; -fx-font-weight: bold;" text="0 kWh" />
-                                </VBox>
-                            </VBox>
-
-                            <VBox style="-fx-background-color: #0f172a; -fx-background-radius: 15; -fx-padding: 25; -fx-border-color: #334155; -fx-border-radius: 15; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, rgba(124, 58, 237, 0.3), 15, 0, 0, 8);" GridPane.columnIndex="2">
-                                <VBox spacing="8">
-                                    <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14; -fx-font-weight: bold;" text="ROOM TEMP" />
-                                    <Label style="-fx-text-fill: #f8fafc; -fx-font-size: 32; -fx-font-weight: bold;" text="22°C" />
-                                </VBox>
-                            </VBox>
-                            <rowConstraints>
-                                <RowConstraints />
-                            </rowConstraints>
-                        </GridPane>
-                    </VBox>
-
-                    <!-- Room Actions Grid -->
-                    <GridPane hgap="15" vgap="15">
+                    <GridPane hgap="20" vgap="15">
                         <columnConstraints>
-                            <ColumnConstraints percentWidth="33" />
-                            <ColumnConstraints percentWidth="33" />
-                            <ColumnConstraints percentWidth="33" />
+                            <ColumnConstraints percentWidth="50" />
+                            <ColumnConstraints percentWidth="50" />
                         </columnConstraints>
 
-                        <Button mnemonicParsing="false" onAction="#turnOnAllLights" style="-fx-background-color: #1e3b20; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 20 15; -fx-pref-height: 80; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 4);" text="💡 All Lights On" GridPane.columnIndex="0" />
-                        <Button mnemonicParsing="false" onAction="#turnOffAllLights" style="-fx-background-color: #662222; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 20 15; -fx-pref-height: 80; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 4);" text="💡 All Lights Off" GridPane.columnIndex="1" />
-                        <Button mnemonicParsing="false" onAction="#setComfortMode" style="-fx-background-color: #32695d; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 20 15; -fx-pref-height: 80; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 4);" text="😊 Comfort Mode" textFill="#32695d" GridPane.columnIndex="2" />
+                        <!-- Security Mode -->
+                        <VBox spacing="8">
+                            <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14;" text="Security Mode" />
+                            <Label fx:id="room1SecurityStatus" style="-fx-text-fill: #10b981; -fx-font-weight: bold; -fx-font-size: 16;" text="ARMED" />
+                        </VBox>
+
+                        <!-- Entry Door -->
+                        <VBox spacing="8">
+                            <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14;" text="Entry Door" />
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <ToggleButton fx:id="room1DoorLock" mnemonicParsing="false" onAction="#toggleRoom1DoorLock"
+                                              style="-fx-background-radius: 15; -fx-pref-width: 100; -fx-pref-height: 35; -fx-font-weight: bold;"
+                                              text="LOCKED" />
+                            </HBox>
+                        </VBox>
+
+                        <!-- Camera -->
+                        <VBox spacing="8">
+                            <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14;" text="Camera" />
+                            <Label fx:id="room1CameraStatus" style="-fx-text-fill: #10b981; -fx-font-weight: bold; -fx-font-size: 16;" text="Recording" />
+                        </VBox>
+
                         <rowConstraints>
+                            <RowConstraints />
                             <RowConstraints />
                         </rowConstraints>
                     </GridPane>
-                </VBox>
-            </ScrollPane>
-        </content>
-    </Tab>
 
-    <!-- AUTOMATION TAB -->
-    <Tab text="⚡ Automation">
-        <content>
-            <ScrollPane fitToWidth="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="939.0" style="-fx-background: #f8f9fa; -fx-border-color: transparent;">
-                <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="866.0" prefWidth="937.0" spacing="25.0" style="-fx-padding: 25; -fx-background-color: #0f172a;">
-                    <VBox spacing="10.0">
-                        <Label style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: white;" text="Automation Rules" textFill="WHITE" />
-                        <Label style="-fx-font-size: 14; -fx-text-fill: #7f8c8d;" text="Set up automatic behaviors for your smart home" />
-                    </VBox>
-
-                    <!-- Create Rule Section -->
-                    <VBox spacing="15.0" style="-fx-background-color: #1e293b; -fx-border-color: #e0e0e0; -fx-border-radius: 12; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(5, 150, 105, 0.3), 15, 0, 0, 8);">
-                        <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: white;" text="Create New Rule" />
-
-                        <GridPane hgap="15" vgap="10">
-                            <columnConstraints>
-                                <ColumnConstraints percentWidth="30" />
-                                <ColumnConstraints percentWidth="70" />
-                            </columnConstraints>
-
-                            <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14;" text="Rule Name:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                            <TextField fx:id="ruleNameField" promptText="Enter rule name" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-
-                            <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14;" text="Trigger:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                            <ComboBox fx:id="triggerCombo" promptText="Select trigger" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-
-                            <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14;" text="Action:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                            <ComboBox fx:id="actionCombo" promptText="Select action" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-
-                            <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14;" text="Schedule:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                            <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                                <TextField fx:id="scheduleTimeField" promptText="HH:MM" />
-                                <CheckBox fx:id="repeatCheck" text="Repeat daily" />
-                            </HBox>
-                            <rowConstraints>
-                                <RowConstraints />
-                                <RowConstraints />
-                                <RowConstraints />
-                                <RowConstraints />
-                            </rowConstraints>
-                        </GridPane>
-
-                        <Button fx:id="createRuleButton" mnemonicParsing="false" onAction="#createRule" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20;" text="Create Rule" />
-                    </VBox>
-
-                    <!-- Active Rules Section -->
-                    <VBox spacing="15.0">
-                        <Label style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: white;" text="Active Rules" />
-
-                        <!-- Rule 1 -->
-                        <HBox spacing="15.0" style="-fx-background-color: #1e293b; -fx-border-color: #1e293b; -fx-border-radius: 12; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(5, 150, 105, 0.3), 15, 0, 0, 8);">
-                            <VBox spacing="5.0">
-                                <Label style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: white;" text="Motion-Activated Lights" />
-                                <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 13;" text="When motion detected, turn on lights" />
-                                <Label style="-fx-text-fill: #3498db; -fx-font-size: 12;" text="Toilet • Living Room" />
-                            </VBox>
-                            <Region HBox.hgrow="ALWAYS" />
-                            <VBox alignment="CENTER_RIGHT" spacing="5.0">
-                                <ToggleButton fx:id="rule1Toggle" selected="true" text="Enabled" />
-                                <HBox spacing="10.0">
-                                    <Button mnemonicParsing="false" onAction="#editRule1" style="-fx-background-color: transparent; -fx-text-fill: #3498db; -fx-border-color: #3498db; -fx-border-radius: 6;" text="Edit" />
-                                    <Button mnemonicParsing="false" onAction="#deleteRule1" style="-fx-background-color: transparent; -fx-text-fill: #e74c3c; -fx-border-color: #e74c3c; -fx-border-radius: 6;" text="Delete" />
-                                </HBox>
-                            </VBox>
-                        </HBox>
-
-                        <!-- Rule 2 -->
-                        <HBox spacing="15.0" style="-fx-background-color: #1e293b; -fx-border-color: #e0e0e0; -fx-border-radius: 12; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(5, 150, 105, 0.3), 15, 0, 0, 8);">
-                            <VBox spacing="5.0">
-                                <Label style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: white;" text="Temperature Control" />
-                                <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 13;" text="When temperature &gt; 25°C, turn on AC" />
-                                <Label style="-fx-text-fill: #3498db; -fx-font-size: 12;" text="Living Room • Scheduled" />
-                            </VBox>
-                            <Region HBox.hgrow="ALWAYS" />
-                            <VBox alignment="CENTER_RIGHT" spacing="5.0">
-                                <ToggleButton fx:id="rule2Toggle" selected="true" text="Enabled" />
-                                <HBox spacing="10.0">
-                                    <Button mnemonicParsing="false" onAction="#editRule2" style="-fx-background-color: transparent; -fx-text-fill: #3498db; -fx-border-color: #3498db; -fx-border-radius: 6;" text="Edit" />
-                                    <Button mnemonicParsing="false" onAction="#deleteRule2" style="-fx-background-color: transparent; -fx-text-fill: #e74c3c; -fx-border-color: #e74c3c; -fx-border-radius: 6;" text="Delete" />
-                                </HBox>
-                            </VBox>
-                        </HBox>
-                    </VBox>
-
-                    <!-- Statistics -->
-                    <GridPane hgap="15" vgap="15">
-                        <columnConstraints>
-                            <ColumnConstraints percentWidth="25" />
-                            <ColumnConstraints percentWidth="25" />
-                            <ColumnConstraints percentWidth="25" />
-                            <ColumnConstraints percentWidth="25" />
-                        </columnConstraints>
-
-                        <VBox style="-fx-background-color: #3a0ca3; -fx-border-color: #e0e0e0; -fx-border-radius: 12; -fx-effect: dropshadow(gaussian, rgba(5, 150, 105, 0.3), 15, 0, 0, 8); -fx-padding: 20;" GridPane.columnIndex="0">
-                            <Label style="-fx-text-fill: white; -fx-font-size: 14; -fx-font-size: bold;" text="Total Rules" />
-                            <Label style="-fx-text-fill: white; -fx-font-size: 24; -fx-font-weight: bold;" text="12" />
-                        </VBox>
-
-                        <VBox style="-fx-background-color: #4361ee; -fx-effect: dropshadow(gaussian, rgba(5, 150, 105, 0.3), 15, 0, 0, 8); -fx-border-color: #e0e0e0; -fx-border-radius: 12; -fx-padding: 20;" GridPane.columnIndex="1">
-                            <Label style="-fx-text-fill: white; -fx-font-size: 14;" text="Active Rules" textFill="#c78d8d" />
-                            <Label style="-fx-text-fill: white; -fx-font-size: 24; -fx-font-weight: bold;" text="8" />
-                        </VBox>
-
-                        <VBox style="-fx-background-color: #4cc9f0; -fx-border-color: #e0e0e0; -fx-border-radius: 12; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(5, 150, 105, 0.3), 15, 0, 0, 8);" GridPane.columnIndex="2">
-                            <Label style="-fx-text-fill: white; -fx-font-size: 14;" text="Today's Executions" />
-                            <Label style="-fx-text-fill: white; -fx-font-size: 24; -fx-font-weight: bold;" text="24" />
-                        </VBox>
-
-                        <VBox style="-fx-background-color: #47848c; -fx-border-color: #e0e0e0; -fx-border-radius: 12; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(5, 150, 105, 0.3), 15, 0, 0, 8);" GridPane.columnIndex="3">
-                            <Label style="-fx-text-fill: white; -fx-font-size: 14;" text="Energy Saved" />
-                            <Label style="-fx-text-fill: white; -fx-font-size: 24; -fx-font-weight: bold;" text="3.2 kWh" textFill="#47848c" />
-                        </VBox>
-                        <rowConstraints>
-                            <RowConstraints />
-                        </rowConstraints>
-                    </GridPane>
-                </VBox>
-            </ScrollPane>
-        </content>
-    </Tab>
-
-    <!-- SETTINGS TAB -->
-    <Tab text="⚙️ Settings">
-        <content>
-            <ScrollPane fitToWidth="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background: #f8f9fa; -fx-border-color: transparent;">
-                <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="886.0" prefWidth="922.0" spacing="25.0" style="-fx-padding: 25; -fx-background-color: #0f172a;">
-                    <VBox spacing="10.0">
-                        <Label style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: white;" text="System Settings" />
-                        <Label style="-fx-font-size: 14; -fx-text-fill: #7f8c8d;" text="Configure your smart home system" />
-                    </VBox>
-
-                    <!-- General Settings -->
-                    <VBox spacing="15.0" style="-fx-background-color: #1e293b; -fx-border-color: #e0e0e0; -fx-border-radius: 12; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
-                        <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: white;" text="General Settings" />
-
-                        <GridPane hgap="15" vgap="10">
-                            <columnConstraints>
-                                <ColumnConstraints percentWidth="30" />
-                                <ColumnConstraints percentWidth="70" />
-                            </columnConstraints>
-
-                            <Label style="-fx-text-fill: #5d6d7e; -fx-font-size: 14;" text="Home Name:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                            <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                <TextField fx:id="homeNameField" text="My Smart Home" />
-                                <Button mnemonicParsing="false" onAction="#updateHomeName" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 8 15;" text="Update" />
-                            </HBox>
-
-                            <Label style="-fx-text-fill: #5d6d7e; -fx-font-size: 14;" text="Temperature Unit:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                            <HBox spacing="15" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                <RadioButton fx:id="celsiusRadio" selected="true" text="°C Celsius" />
-                                <RadioButton fx:id="fahrenheitRadio" text="°F Fahrenheit" />
-                            </HBox>
-
-                            <Label style="-fx-text-fill: #5d6d7e; -fx-font-size: 14;" text="Time Zone:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                            <ComboBox fx:id="timezoneCombo" value="GMT+2" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-
-                            <Label style="-fx-text-fill: #5d6d7e; -fx-font-size: 14;" text="Auto Update:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                            <ToggleButton fx:id="autoUpdateToggle" selected="true" text="Enabled" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                            <rowConstraints>
-                                <RowConstraints />
-                                <RowConstraints />
-                                <RowConstraints />
-                                <RowConstraints />
-                            </rowConstraints>
-                        </GridPane>
-                        <GridPane hgap="15" layoutX="36.0" layoutY="82.0" vgap="10">
-                            <columnConstraints>
-                                <ColumnConstraints percentWidth="30" />
-                                <ColumnConstraints percentWidth="70" />
-                            </columnConstraints>
-                            <children>
-                                <Label style="-fx-text-fill: #5d6d7e; -fx-font-size: 14;" text="Home Name:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                                <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                    <children>
-                                        <TextField fx:id="homeNameField1" text="My Smart Home" />
-                                        <Button mnemonicParsing="false" onAction="#updateHomeName" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 8 15;" text="Update" />
-                                    </children>
-                                </HBox>
-                                <Label style="-fx-text-fill: #5d6d7e; -fx-font-size: 14;" text="Temperature Unit:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                                <HBox spacing="15" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                    <children>
-                                        <RadioButton fx:id="celsiusRadio1" selected="true" text="°C Celsius" />
-                                        <RadioButton fx:id="fahrenheitRadio1" text="°F Fahrenheit" />
-                                    </children>
-                                </HBox>
-                                <Label style="-fx-text-fill: #5d6d7e; -fx-font-size: 14;" text="Time Zone:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                                <ComboBox fx:id="timezoneCombo1" value="GMT+2" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                <Label style="-fx-text-fill: #5d6d7e; -fx-font-size: 14;" text="Auto Update:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                                <ToggleButton fx:id="autoUpdateToggle1" selected="true" text="Enabled" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                            </children>
-                            <rowConstraints>
-                                <RowConstraints />
-                                <RowConstraints />
-                                <RowConstraints />
-                                <RowConstraints />
-                            </rowConstraints>
-                        </GridPane>
-                    </VBox>
-
-                    <!-- Notifications -->
-                    <VBox spacing="15.0" style="-fx-background-color: #1e293b; -fx-border-color: #e0e0e0; -fx-border-radius: 12; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
-                        <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: white;" text="Notifications" />
-
-                        <VBox spacing="10.0">
-                            <HBox spacing="15.0">
-                                <ToggleButton fx:id="notificationsToggle" selected="true" text="Enable Notifications" />
-                                <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 14;" text="Receive alerts for important events" />
-                            </HBox>
-
-                            <VBox spacing="10.0" style="-fx-padding: 10 0;">
-                                <CheckBox fx:id="securityAlertsCheck" selected="true" text="Security Alerts" />
-                                <CheckBox fx:id="deviceAlertsCheck" selected="true" text="Device Alerts" />
-                                <CheckBox fx:id="energyAlertsCheck" selected="true" text="Energy Alerts" />
-                                <CheckBox fx:id="automationAlertsCheck" selected="true" text="Automation Alerts" />
-                            </VBox>
-                        </VBox>
-                    </VBox>
-
-                    <!-- Energy Settings -->
-                    <VBox spacing="15.0" style="-fx-background-color: #1e293b; -fx-border-color: #e0e0e0; -fx-border-radius: 12; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
-                        <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: white;" text="Energy Management" />
-
-                        <GridPane hgap="15" vgap="10">
-                            <columnConstraints>
-                                <ColumnConstraints percentWidth="40" />
-                                <ColumnConstraints percentWidth="60" />
-                            </columnConstraints>
-
-                            <Label style="-fx-text-fill: #5d6d7e; -fx-font-size: 14;" text="Energy Saving Mode:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                            <ToggleButton fx:id="energySavingToggle" selected="true" text="Enabled" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-
-                            <Label style="-fx-text-fill: #5d6d7e; -fx-font-size: 14;" text="Daily Energy Limit:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                            <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                <TextField fx:id="energyLimitField" text="10.0" />
-                                <Label style="-fx-text-fill: #5d6d7e;" text="kWh" />
-                            </HBox>
-
-                            <Label style="-fx-text-fill: #5d6d7e; -fx-font-size: 14;" text="Auto Power Off:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                            <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                <TextField fx:id="autoOffDelayField" text="30" />
-                                <Label style="-fx-text-fill: #5d6d7e;" text="minutes of inactivity" />
-                            </HBox>
-                            <rowConstraints>
-                                <RowConstraints />
-                                <RowConstraints />
-                                <RowConstraints />
-                            </rowConstraints>
-                        </GridPane>
-                    </VBox>
-
-                    <!-- System Actions -->
-                    <HBox spacing="15.0" style="-fx-background-color: #1e293b; -fx-border-color: #e0e0e0; -fx-border-radius: 12; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
-                        <Button mnemonicParsing="false" onAction="#backupSystem" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 12 25;" text="Backup System" />
-                        <Button mnemonicParsing="false" onAction="#restoreSystem" style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 12 25;" text="Restore Backup" />
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Button mnemonicParsing="false" onAction="#resetSystem" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 12 25;" text="Reset System" />
+                    <!-- Add Room/Device Buttons -->
+                    <HBox spacing="15" style="-fx-padding: 15 0 0 0;">
+                        <Button text="+ Add Room"
+                                style="-fx-background-color: transparent; -fx-text-fill: #3b82f6; -fx-border-color: #3b82f6; -fx-border-radius: 8; -fx-padding: 8 16;" />
+                        <Button text="+ Add Device"
+                                style="-fx-background-color: transparent; -fx-text-fill: #10b981; -fx-border-color: #10b981; -fx-border-radius: 8; -fx-padding: 8 16;" />
                     </HBox>
                 </VBox>
-            </ScrollPane>
-        </content>
-    </Tab>
 
-</TabPane>
+                <!-- Room 2 - DYNAMIC CONTENT -->
+                <VBox fx:id="room2Container" spacing="15"
+                      style="-fx-background-color: #1e293b; -fx-background-radius: 15; -fx-padding: 25;">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" text="Room 2" />
+                    </HBox>
+
+                    <!-- Quick Actions for Room 2 -->
+                    <VBox spacing="10">
+                        <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14;" text="Quick Actions" />
+                        <HBox spacing="10">
+                            <Button text="All Lights ON"
+                                    style="-fx-background-color: #059669; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20;" />
+                            <Button text="All Lights OFF"
+                                    style="-fx-background-color: #dc2626; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20;" />
+                            <Button text="Lock All Doors"
+                                    style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20;" />
+                        </HBox>
+                    </VBox>
+                </VBox>
+            </VBox>
+
+            <!-- SCHEDULED TASKS -->
+            <VBox spacing="15">
+                <Label style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" text="Scheduled Tasks" />
+                <VBox fx:id="scheduledTasksContainer" spacing="10"
+                      style="-fx-background-color: #1e293b; -fx-background-radius: 15; -fx-padding: 20;">
+                    <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14;" text="No scheduled tasks" />
+                    <Button text="+ Add Status"
+                            style="-fx-background-color: transparent; -fx-text-fill: #3b82f6; -fx-border-color: #3b82f6; -fx-border-radius: 8; -fx-padding: 8 16; -fx-align-self: flex-start;" />
+                </VBox>
+            </VBox>
+
+        </VBox>
+    </ScrollPane>
+</VBox>
